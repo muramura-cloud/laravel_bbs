@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\PostRequest;
+use Illuminate\Support\Facades\Storage;
 
 class PostsController extends Controller
 {
@@ -21,12 +23,19 @@ class PostsController extends Controller
         return view('posts.create');
     }
 
-    public function store(Request $request)
+    public function store(PostRequest $request)
     {
-        $params = $request->validate([
-            'title' => 'required|max:50',
-            'body' => 'required|max:2000',
-        ]);
+        $params = [
+            'title' => $request->title,
+            'body' => $request->body,
+            'img' => $request->img,
+        ];
+
+        // ここに画像が送信された時の処理
+        if (!empty($request->file('img'))) {
+            $path = $request->file('img')->store('');
+            $params['img'] = basename($path);
+        }
 
         Post::create($params);
 
@@ -48,14 +57,30 @@ class PostsController extends Controller
         return    view('posts.edit', ['post' => $post]);
     }
 
-    public function update($post_id, Request $request)
+    public function update($post_id, PostRequest $request)
     {
-        $params = $request->validate([
-            'title' => 'required|max:50',
-            'body' => 'required|max:2000',
-        ]);
+        $params = [
+            'title' => $request->title,
+            'body' => $request->body,
+            'img' => $request->img,
+        ];
 
         $post = Post::findOrFail($post_id);
+
+        // 画像削除ボタンが押されているかどうか確認する
+        if (!empty($request->del_img)) {
+            // 送信された画像のファイル名で画像を削除する
+            Storage::delete($post->img);
+            $params['img'] = null;
+        } elseif (!empty($request->file('img'))) {
+            $path = $request->file('img')->store('');
+            $params['img'] = basename($path);
+
+            if (!empty($post->img)) {
+                Storage::delete($post->img);
+            }
+        }
+
         $post->fill($params)->save();
 
         return redirect()->route('posts.show', ['post' => $post]);
@@ -65,6 +90,10 @@ class PostsController extends Controller
     public function destroy($post_id)
     {
         $post = Post::findOrFail($post_id);
+
+        if (!empty($post->img)) {
+            Storage::delete($post->img);
+        }
 
         DB::transaction(function () use ($post) {
             $post->comments()->delete();

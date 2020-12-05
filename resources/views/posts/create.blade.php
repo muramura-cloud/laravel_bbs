@@ -7,12 +7,12 @@
             投稿の新規作成
         </h1>
 
-        <form method="post" action="{{ route('posts.store') }}">
+        <form method="post" action="{{ route('posts.store') }}" enctype="multipart/form-data">
             @csrf
 
             <fieldset class="mb-4">
                 <div class="form-group">
-                    <label for="title">タイトル</label>
+                    <label for="title"><strong>タイトル</strong>(必須)</label>
                     <input id="title" name="title" class="form-control {{ $errors->has('title') ? 'is-invalid' : '' }}"
                         value="{{ old('title') }}" type="text">
                     @if ($errors->has('title'))
@@ -23,7 +23,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="body">本文</label>
+                    <label for="body"><strong>本文</strong>(必須)</label>
                     <textarea id="body" name="body" class="form-control {{ $errors->has('body') ? 'is-invalid' : '' }}"
                         rows="4">{{ old('body') }}</textarea>
                     @if ($errors->has('body'))
@@ -34,8 +34,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="img">画像</label>
-                    <input type="file">
+                    <label for="img"><strong>画像</strong>(任意)</label><br>
+                    <input type="file" name="img" id="img"
+                        class="form-control {{ $errors->has('img') ? 'is-invalid' : '' }}">
                     @if ($errors->has('img'))
                     <div class="invalid-feedback">
                         {{ $errors->first('img') }}

@@ -3,8 +3,22 @@
 @section('content')
 <div class="container mt-4">
     <div class="border p-4">
+        @if (!empty($post->img))
+        <div class="d-flex">
+            <div class="p-2 col-6">
+                <h1 class="h5 mb-4">{{ $post->title }}</h1>
+                <p class="mb-5">{{$post->body}}</p>
+            </div>
+            <div class="p-2 col-6">
+                <a href="{{asset('storage/' . $post->img)}}"><img src="{{asset('storage/' . $post->img)}}"
+                        class="img-fluid"></a>
+            </div>
+        </div>
+        @else
         <h1 class="h5 mb-4">{{ $post->title }}</h1>
         <p class="mb-5">{{$post->body}}</p>
+        @endif
+
         <div class="mb-4 text-left">
             <a class="btn btn-primary" href="{{ route('posts.edit', ['post' => $post->id]) }}">編集する</a>
             <form style="display: inline-block;" method="POST"
