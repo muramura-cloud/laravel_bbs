@@ -18,4 +18,10 @@ class Comment extends Model
         // 関連づけられている主テーブルの理コードを取り出す
         return $this->belongsTo('App\Models\Post');
     }
+
+    // 紐づけられている主テーブルを取得
+    public function getPost()
+    {
+        return $this->post;
+    }
 }

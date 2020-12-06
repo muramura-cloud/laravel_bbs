@@ -31,7 +31,6 @@ class PostsController extends Controller
             'img' => $request->img,
         ];
 
-        // ここに画像が送信された時の処理
         if (!empty($request->file('img'))) {
             $path = $request->file('img')->store('');
             $params['img'] = basename($path);
@@ -67,9 +66,7 @@ class PostsController extends Controller
 
         $post = Post::findOrFail($post_id);
 
-        // 画像削除ボタンが押されているかどうか確認する
         if (!empty($request->del_img)) {
-            // 送信された画像のファイル名で画像を削除する
             Storage::delete($post->img);
             $params['img'] = null;
         } elseif (!empty($request->file('img'))) {

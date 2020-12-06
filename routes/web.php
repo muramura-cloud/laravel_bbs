@@ -20,4 +20,4 @@ Route::get('/', 'App\Http\Controllers\PostsController@index')->name('top');
 Route::resource('posts', 'App\Http\Controllers\PostsController', ['only' => ['create', 'store', 'show', 'edit', 'update', 'destroy']]);
 
 // コメント
-Route::resource('comments', 'App\Http\Controllers\CommentsController', ['only' => ['store']]);
+Route::resource('comments', 'App\Http\Controllers\CommentsController', ['only' => ['store', 'edit', 'update', 'destroy']]);

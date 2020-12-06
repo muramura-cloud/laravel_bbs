@@ -36,7 +36,7 @@
 
             <input type="hidden" name="post_id" value="{{$post->id}}">
             <div class="form-group">
-                <label for="body">本文</label>
+                <label for="body"><strong>本文(必須)</strong></label>
                 <textarea name="body" class="form-control {{$errors->has('body') ? 'is-invalid' : ''}}" rows="4">{{old('body')}}
                 </textarea>
                 @if ($errors->has('body'))
@@ -59,6 +59,17 @@
             <div class="border-top p-4">
                 <time class="text-secondary">{{ $comment->created_at->format('Y.m.d H:i') }}</time>
                 <p class="mt-2">{{$comment->body}}</p>
+                <div class="mb-4 text-right">
+                    <a class="btn btn-primary" href="{{ route('comments.edit', ['comment' => $comment->id]) }}">編集する</a>
+                    <form style="display: inline-block;" method="POST"
+                        action="{{ route('comments.destroy', ['comment' => $comment->id]) }}">
+                        @csrf
+                        @method('DELETE')
+
+                        <button class="btn btn-danger">削除する</button>
+                    </form>
+
+                </div>
             </div>
             @empty
             <p>コメントはまだありません。</p>
