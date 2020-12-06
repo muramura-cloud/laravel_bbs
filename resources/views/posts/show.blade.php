@@ -23,6 +23,7 @@
             <a class="btn btn-primary" href="{{ route('posts.edit', ['post' => $post->id]) }}">編集する</a>
             <form style="display: inline-block;" method="POST"
                 action="{{ route('posts.destroy', ['post' => $post->id]) }}">
+                <input type="hidden" name="page" value="{{$page}}">
                 @csrf
                 @method('DELETE')
 
@@ -78,7 +79,7 @@
     </div>
 
     <div class="mt-5">
-        <a class="btn btn-secondary" href="{{ route('top') }}">戻る</a>
+        <a class="btn btn-secondary" href="{{ route('top',['page'=>$page]) }}">戻る</a>
     </div>
 </div>
 @endsection

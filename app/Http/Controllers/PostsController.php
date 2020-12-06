@@ -7,12 +7,14 @@ use App\Models\Post;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\PostRequest;
 use Illuminate\Support\Facades\Storage;
+use App\lib\My_func;
 
 class PostsController extends Controller
 {
     public function index()
     {
         // withでn+1問題を解決
+        // paginate()での返り値はLengthAwarePaginatorオブジェクトらしい。
         $posts = Post::with(['comments'])->orderBy('created_at', 'desc')->paginate(10);
 
         return view('posts.index', ['posts' => $posts]);
@@ -41,12 +43,11 @@ class PostsController extends Controller
         return redirect()->route('top');
     }
 
-    public function show($post_id)
+    public function show($post_id, Request $request)
     {
-        // findOrFailは該当するレコードが見つからなかった場合に例外を投げる。
         $post = Post::findOrFail($post_id);
 
-        return view('posts.show', ['post' => $post]);
+        return view('posts.show', ['post' => $post, 'page' => $request->page]);
     }
 
     public function edit($post_id)
@@ -84,7 +85,7 @@ class PostsController extends Controller
     }
 
     // 投稿を削除するにはそれに紐づいているコメントも削除する必要がある。
-    public function destroy($post_id)
+    public function destroy($post_id, Request $request)
     {
         $post = Post::findOrFail($post_id);
 
@@ -97,6 +98,12 @@ class PostsController extends Controller
             $post->delete();
         });
 
-        return redirect()->route('top');
+        // return redirect()->route('top');
+        return redirect()->route('top', ['page' => $request->page]);
+    }
+
+    public function back()
+    {
+        return back();
     }
 }

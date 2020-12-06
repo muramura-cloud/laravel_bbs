@@ -16,9 +16,17 @@
         <div class="card-body">
             <h4 class="card-title">{{$post->title}}</h4>
             <p class="card-text">{{$post->body}}</p>
-            {{-- postコントローラーのshowメソッドの引数である投稿idを渡している。 --}}
             <div class="mb-1">
-                <a class="btn btn-primary" href="{{ route('posts.show', ['post' => $post->id]) }}">続きを読む</a>
+                {{-- ['post'=>$post->id]のpostは勝手に変えちゃダメっぽい。多分モデルの名前かもしれない。 --}}
+                <form style="display: inline-block;" method="get"
+                    action="{{ route('posts.show', ['post' => $post->id]) }}">
+                    @csrf
+
+                    <input type="hidden" name="page" value="{{$posts->currentPage()}}">
+                    <button class="btn btn-success">続きを読む</button>
+                </form>
+
+                {{-- <a class="btn btn-primary" href="{{ route('posts.show',['post' => $post->id]) }}">続きを読む</a> --}}
             </div>
         </div>
         <div class="card-footer">
