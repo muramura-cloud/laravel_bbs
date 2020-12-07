@@ -19,18 +19,21 @@
         <p class="mb-5">{{$post->body}}</p>
         @endif
 
+        @auth
+        @if ($post->user_id === $user->id)
         <div class="mb-4 text-left">
-            <a class="btn btn-primary" href="{{ route('posts.edit', ['post' => $post->id]) }}">編集する</a>
+            <a class="btn btn-primary" href="{{ route('posts.edit', ['post' => $post->id]) }}">編集</a>
             <form style="display: inline-block;" method="POST"
                 action="{{ route('posts.destroy', ['post' => $post->id]) }}">
                 <input type="hidden" name="page" value="{{$page}}">
                 @csrf
                 @method('DELETE')
 
-                <button class="btn btn-danger">削除する</button>
+                <button class="btn btn-danger">削除</button>
             </form>
-
         </div>
+        @endif
+        @endauth
 
         <form action="{{ route('comments.store') }}" method="post">
             @csrf
@@ -58,19 +61,24 @@
             {{-- モデルでリレーションを設定しているからcommentsプロパティを使用できる。 --}}
             @forelse($post->comments as $comment)
             <div class="border-top p-4">
-                <time class="text-secondary">{{ $comment->created_at->format('Y.m.d H:i') }}</time>
+                <time class="text-secondary">{{ $comment->created_at->format('Y.m.d H:i') }}
+                    {{$comment->user ? ' 投稿者 : ' . $comment->user->name : ''}}</time>
                 <p class="mt-2">{{$comment->body}}</p>
+                @auth
+                @if ($comment->user_id === $user->id)
                 <div class="mb-4 text-right">
-                    <a class="btn btn-primary" href="{{ route('comments.edit', ['comment' => $comment->id]) }}">編集する</a>
+                    <a class="btn btn-primary p-1"
+                        href="{{ route('comments.edit', ['comment' => $comment->id]) }}"><small>編集</small></a>
                     <form style="display: inline-block;" method="POST"
                         action="{{ route('comments.destroy', ['comment' => $comment->id]) }}">
                         @csrf
                         @method('DELETE')
 
-                        <button class="btn btn-danger">削除する</button>
+                        <button class="btn btn-danger p-1"><small>削除</small></button>
                     </form>
-
                 </div>
+                @endif
+                @endauth
             </div>
             @empty
             <p>コメントはまだありません。</p>

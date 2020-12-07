@@ -17,6 +17,7 @@ class CreateCommentsTable extends Migration
             $table->increments('id');
             // これは符号なしの整数値を条件として設定している。これをしないエラーになるらしい。
             $table->unsignedInteger('post_id');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->text('body');
             $table->timestamps();
 
@@ -24,6 +25,7 @@ class CreateCommentsTable extends Migration
             // referencesメソッドで従テーブルと紐づいている主テーブルのidを設定する。
             // onメソッドで主テーブルを指定する。
             $table->foreign('post_id')->references('id')->on('posts');
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

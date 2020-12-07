@@ -15,10 +15,15 @@ class CreatePostsTable extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
+            // $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->string('title', 50);
             $table->text('body');
-            $table->string('img', 40);
+            $table->string('img', 100)->nullable();
             $table->timestamps();
+
+            // 外部キーの制約をつけているからおそらく、投稿する時にpostレコードにユーザーidが必要になる。それがないとおそらく投稿できない。
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

@@ -26,6 +26,8 @@ class CommentRequest extends FormRequest
     public function messages()
     {
         return [
+            'post_id.required' => '投稿IDが必須です。',
+            'post_id.exists' => 'post_idがpostsテーブルのIdと一致しなくてはなりません。',
             'body.required' => '本文は必須項目です。',
             'body.max' => '本文は2000文字以下です。',
         ];

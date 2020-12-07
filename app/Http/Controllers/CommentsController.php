@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\Comment;
 use App\Http\Requests\CommentRequest;
+use Illuminate\Support\Facades\Auth;
 use App\lib\My_func;
 
 class CommentsController extends Controller
@@ -14,6 +15,7 @@ class CommentsController extends Controller
     {
         $params = [
             'post_id' => $request->post_id,
+            'user_id' => Auth::id(),
             'body' => $request->body,
         ];
 
@@ -27,18 +29,25 @@ class CommentsController extends Controller
 
     public function edit($comment_id)
     {
+        $user = null;
+        if (Auth::check()) {
+            $user = Auth::user();
+        }
+
+        // $userがnullだったらトップページにリダイレクトさせた用が良くない?
+
         $comment = Comment::findOrFail($comment_id);
 
-        return view('comments.edit', ['comment' => $comment, 'post' => $comment->getPost()]);
+        return view('comments.edit', ['comment' => $comment, 'post' => $comment->getPost(), 'user' => $user]);
     }
 
     public function update($comment_id, CommentRequest $request)
     {
+        $comment = Comment::findOrFail($comment_id);
+
         $params = [
             'body' => $request->body,
         ];
-
-        $comment = Comment::findOrFail($comment_id);
 
         $comment->fill($params)->save();
 

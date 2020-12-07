@@ -22,8 +22,10 @@ class PostFactory extends Factory
     public function definition()
     {
         return [
-            'title'=>'これはテストタイトルです。',
-            'body'=>'これはテストコメントです。これはコメントです。これはコメントです。',
+            'user_id' => null,
+            'title' => 'これはテストタイトルです。',
+            'body' => 'これはテストコメントです。これはコメントです。これはコメントです。',
+            'img' => null,
         ];
     }
 }

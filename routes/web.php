@@ -17,7 +17,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', 'App\Http\Controllers\PostsController@index')->name('top');
 
 // 投稿
+// resourceはcrud処理を自動登録してくれるがそれ以外はできない。
 Route::resource('posts', 'App\Http\Controllers\PostsController', ['only' => ['create', 'store', 'show', 'edit', 'update', 'destroy']]);
 
 // コメント
 Route::resource('comments', 'App\Http\Controllers\CommentsController', ['only' => ['store', 'edit', 'update', 'destroy']]);
+
+// 認証
+Route::get('/logout', 'App\Http\Controllers\UsersController@logout');
+Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
+    return redirect()->route('top');
+})->name('dashboard');

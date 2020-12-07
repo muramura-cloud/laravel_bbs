@@ -6,6 +6,7 @@
         <h1 class="h5 mb-4">コメントの編集</h1>
 
         <form action="{{route('comments.update',['comment'=>$comment->id])}}" method="post">
+            <input type="hidden" name="post_id" value="{{$comment->post_id}}">
             @csrf
             @method('put')
 

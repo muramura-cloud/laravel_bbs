@@ -12,6 +12,7 @@ class Post extends Model
 
     // fillableはモデルを利用してデータを作成する時に、複数代入を許可するための設定
     protected $fillable = [
+        'user_id',
         'title',
         'body',
         'img',
@@ -21,5 +22,10 @@ class Post extends Model
     {
         // これによってPostクラス内でcommentsというプロパティでcommentインスタンスを取り出すことができる。
         return $this->hasMany('App\Models\Comment');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User');
     }
 }

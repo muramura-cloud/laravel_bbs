@@ -10,7 +10,8 @@ class Comment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'body'
+        'user_id',
+        'body',
     ];
 
     public function post()
@@ -23,5 +24,10 @@ class Comment extends Model
     public function getPost()
     {
         return $this->post;
+    }
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User');
     }
 }

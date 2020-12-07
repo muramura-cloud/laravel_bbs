@@ -1,6 +1,7 @@
 @extends('layouts.layout')
 
 @section('content')
+
 <div class="container mt-4">
     <div class="mb-4">
         <a href="{{ route('posts.create') }}" class="btn btn-primary">
@@ -25,12 +26,11 @@
                     <input type="hidden" name="page" value="{{$posts->currentPage()}}">
                     <button class="btn btn-success">続きを読む</button>
                 </form>
-
-                {{-- <a class="btn btn-primary" href="{{ route('posts.show',['post' => $post->id]) }}">続きを読む</a> --}}
             </div>
         </div>
         <div class="card-footer">
-            <span class="mr-2">投稿日時 {{$post->created_at->format('Y.m.d')}}</span>
+            <span class="mr-2">投稿日時 : {{$post->created_at->format('Y.m.d')}}
+                {{$post->user ? ' 投稿者 : ' . $post->user->name : ''}}</span>
 
             @if ($post->comments->count())
             <span class="badge badge-primary">

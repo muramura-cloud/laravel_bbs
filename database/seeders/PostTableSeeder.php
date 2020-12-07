@@ -15,7 +15,7 @@ class PostTableSeeder extends Seeder
      */
     public function run()
     {
-        Post::factory()->count(50)->create()->each(function ($post) {
+        Post::factory()->count(20)->create()->each(function ($post) {
             $comments = Comment::factory()->count(2)->make();
             $post->comments()->saveMany($comments);
         });
