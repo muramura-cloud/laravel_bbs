@@ -62,7 +62,7 @@
             @forelse($post->comments as $comment)
             <div class="border-top p-4">
                 <time class="text-secondary">{{ $comment->created_at->format('Y.m.d H:i') }}
-                    {{$comment->user ? ' 投稿者 : ' . $comment->user->name : ''}}</time>
+                    {{$comment->user ? ' コメント主 : ' . $comment->user->name : ''}}</time>
                 <p class="mt-2">{{$comment->body}}</p>
                 @auth
                 @if ($comment->user_id === $user->id)

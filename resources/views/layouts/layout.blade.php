@@ -25,6 +25,9 @@
                     <li class="nav-item">
                         <a class="nav-link disabled" href="{{route('dashboard')}}">Disabled</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="{{route('admin_top')}}">管理者はこちら</a>
+                    </li>
                 </ul>
                 <div>
                     @auth

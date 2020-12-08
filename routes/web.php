@@ -28,3 +28,7 @@ Route::get('/logout', 'App\Http\Controllers\UsersController@logout');
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return redirect()->route('top');
 })->name('dashboard');
+
+// admin
+Route::get('/admin', 'App\Http\Controllers\AdminController@index')->name('admin_top');
+Route::post('/admin', 'App\Http\Controllers\AdminController@destroy');
