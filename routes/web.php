@@ -29,6 +29,7 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return redirect()->route('top');
 })->name('dashboard');
 
-// admin
+// 管理者ページ
 Route::get('/admin', 'App\Http\Controllers\AdminController@index')->name('admin_top');
-Route::post('/admin', 'App\Http\Controllers\AdminController@destroy');
+Route::post('/admin_delete', 'App\Http\Controllers\AdminController@destroy');
+Route::post('/admin_mult_delete', 'App\Http\Controllers\AdminController@multDestroy');
