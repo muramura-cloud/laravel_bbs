@@ -7,6 +7,8 @@
 
         <form action="{{route('comments.update',['comment'=>$comment->id])}}" method="post">
             <input type="hidden" name="post_id" value="{{$comment->post_id}}">
+            <input type="hidden" name="page" value="{{$page}}">
+            <input type="hidden" name="keyword" value="{{$keyword}}">
             @csrf
             @method('put')
 
@@ -23,7 +25,8 @@
                 </div>
 
                 <div class="mt-5">
-                    <a class="btn btn-secondary" href="{{ route('posts.show', ['post' => $post]) }}">キャンセル</a>
+                    <a class="btn btn-secondary"
+                        href="{{ route('posts.show', ['post' => $post,'page'=>$page,'keyword'=>$keyword]) }}">キャンセル</a>
                     <button type="submit" class="btn btn-primary">更新する</button>
                 </div>
             </fieldset>

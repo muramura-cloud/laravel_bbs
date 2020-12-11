@@ -24,10 +24,10 @@ class CommentsController extends Controller
         // ただし、createメソッドを使う場合はモデルのプロパティにguarded(ブラックリスト)あるいはfillable（ホワイトリスト）を設定する必要がある。
         $post->comments()->create($params);
 
-        return redirect()->route('posts.show', ['post' => $post]);
+        return redirect()->route('posts.show', ['post' => $post, 'page' => $request->page, 'keyword' => $request->keyword]);
     }
 
-    public function edit($comment_id)
+    public function edit($comment_id, Request $request)
     {
         $user = null;
         if (Auth::check()) {
@@ -38,7 +38,15 @@ class CommentsController extends Controller
 
         $comment = Comment::findOrFail($comment_id);
 
-        return view('comments.edit', ['comment' => $comment, 'post' => $comment->getPost(), 'user' => $user]);
+        $params = [
+            'comment' => $comment,
+            'post' => $comment->getPost(),
+            'user' => $user,
+            'page' => $request->page,
+            'keyword' => $request->keyword
+        ];
+
+        return view('comments.edit', $params);
     }
 
     public function update($comment_id, CommentRequest $request)
@@ -51,15 +59,15 @@ class CommentsController extends Controller
 
         $comment->fill($params)->save();
 
-        return redirect()->route('posts.show', ['post' => $comment->getPost()]);
+        return redirect()->route('posts.show', ['post' => $comment->getPost(), 'page' => $request->page, 'keyword' => $request->keyword]);
     }
 
-    public function destroy($comment_id)
+    public function destroy($comment_id, Request $request)
     {
         $comment = Comment::findOrFail($comment_id);
 
         $comment->delete();
 
-        return redirect()->route('posts.show', ['post' => $comment->getPost()]);
+        return redirect()->route('posts.show', ['post' => $comment->getPost(), 'page' => $request->page, 'keyword' => $request->keyword]);
     }
 }

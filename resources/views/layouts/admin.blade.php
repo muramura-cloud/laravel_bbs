@@ -25,32 +25,7 @@
                     <li class="nav-item">
                         <a class="nav-link disabled" href="{{route('dashboard')}}">Disabled</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled" href="{{route('admin_top')}}">管理者はこちら</a>
-                    </li>
                 </ul>
-                <form class="form-inline my-2 my-lg-0" method="get" action="{{route('search')}}">
-                    @csrf
-
-                    <input class="form-control mr-sm-2" type="text" name="keyword" placeholder="検索ワード"
-                        aria-label="Search">
-                    <button class="btn btn-outline-success my-2 my-sm-0 mr-3" type="submit">検索</button>
-                </form>
-                <div>
-                    @auth
-                    <span class="navbar-text mr-1">ユーザー名 : {{$user->name}}</span>
-                    <a href="/logout">
-                        <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">ログアウト</button>
-                    </a>
-                    @else
-                    <a href="{{route('login')}}">
-                        <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">ログイン</button>
-                    </a>
-                    <a href="{{route('register')}}">
-                        <button class="btn btn-outline-warning my-2 my-sm-0" type="submit">新規登録</button>
-                    </a>
-                    @endauth
-                </div>
             </div>
         </nav>
 

@@ -3,13 +3,9 @@
 @section('content')
 
 <div class="container mt-4">
-    <div class="mb-4">
-        <a href="{{ route('posts.create') }}" class="btn btn-primary">
-            投稿を新規作成する
-        </a>
-    </div>
-    
-    @foreach ($posts as $post)
+    <h2>検索結果</h2><br>
+
+    @forelse ($posts as $post)
     <div class="card mb-4">
         @if (!empty($post->img))
         <div class="text-center">
@@ -26,6 +22,7 @@
                     @csrf
 
                     <input type="hidden" name="page" value="{{$posts->currentPage()}}">
+                    <input type="hidden" name="keyword" value="{{$keyword}}">
                     <button class="btn btn-success">続きを読む</button>
                 </form>
             </div>
@@ -41,9 +38,17 @@
             @endif
         </div>
     </div>
-    @endforeach
-</div>
-<div class="d-flex justify-content-center mb-5">
-    {{ $posts->links() }}
+    @empty
+    <p>検索に一致する投稿はありません。</p>
+    @endforelse
+    
+    @if (!empty($posts))
+    <div class="d-flex justify-content-center mb-5">
+        {{ $posts->links() }}
+    </div>
+    @endif
+    <div class="mt-5">
+        <a class="btn btn-secondary" href="{{ route('top',['page'=>$page]) }}">戻る</a>
+    </div>
 </div>
 @endsection

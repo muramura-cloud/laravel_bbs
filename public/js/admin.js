@@ -13,7 +13,7 @@ for (var i = 0; i < admin_delete_btns.length; i++) {
 
 
         var options = {
-            text: '本当に投稿を削除しますか？',
+            text: '本当に削除しますか？',
             buttons: {
                 ok: '削除する',
                 cancel: 'キャンセル',
@@ -32,8 +32,21 @@ for (var i = 0; i < admin_delete_btns.length; i++) {
 document.getElementById('all_check_btn').addEventListener('click', function () {
     let delete_checkboxes = document.getElementsByName('delete_checkbox');
 
+    let check_count = 0;
     for (let i = 0; i < delete_checkboxes.length; i++) {
-        delete_checkboxes[i].checked = true;
+        if (delete_checkboxes[i].checked) {
+            check_count++;
+        }
+    }
+
+    if (check_count === delete_checkboxes.length) {
+        for (let i = 0; i < delete_checkboxes.length; i++) {
+            delete_checkboxes[i].checked = false;
+        }
+    } else {
+        for (let i = 0; i < delete_checkboxes.length; i++) {
+            delete_checkboxes[i].checked = true;
+        }
     }
 });
 
@@ -43,16 +56,15 @@ document.getElementById('mult_delete_btn').addEventListener('click', function (e
 
     let delete_checkboxes = document.getElementsByName('delete_checkbox');
 
-    let delete_post_ids = [];
+    let delete_ids = [];
     for (let i = 0; i < delete_checkboxes.length; i++) {
         if (delete_checkboxes[i].checked) {
             // console.log(delete_checkboxes[i].value);
-            delete_post_ids.push(delete_checkboxes[i].value);
+            delete_ids.push(delete_checkboxes[i].value);
         }
     }
 
-    // 何もチェックされなかった場合はどうなる？
-    if (delete_post_ids.length === 0) {
+    if (delete_ids.length === 0) {
         swal('削除する投稿にチェックを入れてください。');
         return;
     } else {
@@ -65,7 +77,7 @@ document.getElementById('mult_delete_btn').addEventListener('click', function (e
         };
         swal(options).then(function (value) {
             if (value) {
-                document.getElementById('post_ids').value = delete_post_ids;
+                document.getElementById('ids').value = delete_ids;
                 document.getElementById('admin_mult_delete_form').submit();
             }
         });

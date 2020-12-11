@@ -12,7 +12,6 @@ use App\lib\My_func;
 
 class PostsController extends Controller
 {
-    // ログインしていなかったらログイン画面に飛ばす
     public function index()
     {
         $user = null;
@@ -24,21 +23,19 @@ class PostsController extends Controller
         // paginate()での返り値はLengthAwarePaginatorオブジェクトらしい。
         $posts = Post::with(['comments'])->orderBy('created_at', 'desc')->paginate(10);
 
-        return view('posts.index', ['posts' => $posts, 'user' => $user]);
+        return view('posts.index', ['posts' => $posts, 'user' => $user, 'page' => $posts->currentPage()]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $user = null;
         if (Auth::check()) {
             $user = Auth::user();
         }
 
-        return view('posts.create', ['user' => $user]);
+        return view('posts.create', ['user' => $user, 'page' => $request->page]);
     }
 
-    // ログインしていないユーザーには投稿させないような使用しなきゃダメかも
-    // あるいはここでuser_idをnullにするとかそうすればその投稿はユーザーがいない投稿になる。でも、mysqlの絡むの設定を変更する必要がある。
     public function store(PostRequest $request)
     {
         $params = [
@@ -67,13 +64,10 @@ class PostsController extends Controller
 
         $post = Post::findOrFail($post_id);
 
-        // print_r($post->user);
-        // echo  $post->user->name;
-
-        return view('posts.show', ['post' => $post, 'page' => $request->page, 'user' => $user]);
+        return view('posts.show', ['post' => $post, 'page' => $request->page, 'user' => $user, 'keyword' => $request->keyword]);
     }
 
-    public function edit($post_id)
+    public function edit($post_id, Request $request)
     {
         $user = null;
         if (Auth::check()) {
@@ -82,7 +76,7 @@ class PostsController extends Controller
 
         $post = Post::findOrFail($post_id);
 
-        return view('posts.edit', ['post' => $post, 'user' => $user]);
+        return view('posts.edit', ['post' => $post, 'user' => $user, 'page' => $request->page, 'keyword' => $request->keyword]);
     }
 
     public function update($post_id, PostRequest $request)
@@ -109,10 +103,9 @@ class PostsController extends Controller
 
         $post->fill($params)->save();
 
-        return redirect()->route('posts.show', ['post' => $post]);
+        return redirect()->route('posts.show', ['post' => $post, 'page' => $request->page, 'keyword' => $request->keyword]);
     }
 
-    // 投稿を削除するにはそれに紐づいているコメントも削除する必要がある。
     public function destroy($post_id, Request $request)
     {
         $post = Post::findOrFail($post_id);
@@ -126,6 +119,32 @@ class PostsController extends Controller
             $post->delete();
         });
 
+        if (!empty($request->keyword)) {
+            return redirect()->route('search', ['page' => (int) $request->page, 'keyword' => $request->keyword]);
+        }
+
         return redirect()->route('top', ['page' => $request->page]);
+    }
+
+    public function search(Request $request)
+    {
+        $user = null;
+        if (Auth::check()) {
+            $user = Auth::user();
+        }
+
+        $query = Post::query();
+
+        $keyword = preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['keyword']);
+
+        $posts = [];
+        if (!empty($keyword)) {
+            $query->where('title', 'LIKE', "%{$keyword}%")
+                ->orWhere('body', 'LIKE', "%{$keyword}%")->get();
+
+            $posts = $query->paginate(10);
+        }
+
+        return view('posts.find', ['posts' => $posts, 'user' => $user, 'page' => (int) $request->page, 'keyword' => $keyword]);
     }
 }

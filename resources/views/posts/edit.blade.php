@@ -6,7 +6,8 @@
         <h1 class="h5 mb-4">投稿の編集</h1>
 
         {{-- htmlのフォームがput送信に対応していないからpostになっているけど、laravelでプtに直している。 --}}
-        <form action="{{route('posts.update',['post'=>$post->id])}}" method="post" enctype="multipart/form-data">
+        <form action="{{route('posts.update',['post'=>$post->id,'page'=>$page,'keyword'=>$keyword])}}" method="post"
+            enctype="multipart/form-data">
             @csrf
             @method('put')
 
@@ -58,7 +59,8 @@
                 </div>
 
                 <div class="mt-5">
-                    <a class="btn btn-secondary" href="{{ route('posts.show', ['post' => $post]) }}">キャンセル</a>
+                    <a class="btn btn-secondary"
+                        href="{{ route('posts.show', ['post' => $post,'page'=>$page, 'keyword'=>$keyword]) }}">キャンセル</a>
                     <button type="submit" class="btn btn-primary">更新する</button>
                 </div>
             </fieldset>

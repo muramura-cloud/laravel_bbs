@@ -1,4 +1,4 @@
-@extends('layouts.layout')
+@extends('layouts.admin')
 
 @section('content')
 
@@ -7,7 +7,8 @@
     <table class="table table-bordered">
         <thead class="thead-dark">
             <tr>
-                <th scope="col"><input class="btn btn-danger" style="width: 80px;" id="all_check_btn" value="全選択"></th>
+                <th scope="col"><input class="btn btn-danger" type="button" style="width: 80px;" id="all_check_btn"
+                        value="全選択"></th>
                 <th scope="col">ID</th>
                 <th scope="col">タイトル</th>
                 <th scope="col">本文</th>
@@ -34,20 +35,9 @@
                 </td>
                 <td>
                     @if ($post->comments->count())
-                    <table class="table table-bordered">
-                        <tr>
-                            <th class="thead-light">
-                                コメント一覧
-                            </th>
-                        </tr>
-                        @foreach ($post->comments as $comment)
-                        <tr>
-                            <td>{{$comment->body}}</td>
-                        </tr>
-                        @endforeach
-                    </table>
+                    <a href="/admin_comment/{{$post->id}}" class="btn">コメント一覧へ</a>
                     @else
-                    コメントなし
+                    コメント無し
                     @endif
                 </td>
                 <td>{{$post->created_at}}</td>
@@ -66,7 +56,7 @@
     <form id="admin_mult_delete_form" style="display: inline-block;" method="post" action="/admin_mult_delete">
         @csrf
 
-        <input type="hidden" id="post_ids" name="post_ids" value="">
+        <input type="hidden" id="ids" name="post_ids[]" value="">
         <button id="mult_delete_btn" class="btn btn-danger">チェックした投稿を削除</button>
     </form>
 </div>

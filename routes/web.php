@@ -15,10 +15,11 @@ use Illuminate\Support\Facades\Route;
 
 // トップページ
 Route::get('/', 'App\Http\Controllers\PostsController@index')->name('top');
+// Route::post('/search', 'App\Http\Controllers\PostsController@search')->name('search');
+Route::get('/search', 'App\Http\Controllers\PostsController@search')->name('search');
 
 // 投稿
-// resourceはcrud処理を自動登録してくれるがそれ以外はできない。
-Route::resource('posts', 'App\Http\Controllers\PostsController', ['only' => ['create', 'store', 'show', 'edit', 'update', 'destroy']]);
+Route::resource('posts', 'App\Http\Controllers\PostsController', ['only' => ['create', 'store', 'show', 'edit', 'update', 'destroy']];)
 
 // コメント
 Route::resource('comments', 'App\Http\Controllers\CommentsController', ['only' => ['store', 'edit', 'update', 'destroy']]);
@@ -30,6 +31,10 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
 })->name('dashboard');
 
 // 管理者ページ
+// これは投稿やコメントと同じ感じのルーティングにできないの？
 Route::get('/admin', 'App\Http\Controllers\AdminController@index')->name('admin_top');
+Route::get('/admin_comment/{post_id}', 'App\Http\Controllers\AdminController@showComments');
 Route::post('/admin_delete', 'App\Http\Controllers\AdminController@destroy');
 Route::post('/admin_mult_delete', 'App\Http\Controllers\AdminController@multDestroy');
+Route::post('/admin_comment_delete', 'App\Http\Controllers\AdminController@commentDestroy');
+Route::post('/admin_mult_comment_delete', 'App\Http\Controllers\AdminController@commentMultDestroy');
