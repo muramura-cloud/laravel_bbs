@@ -19,7 +19,7 @@ Route::get('/', 'App\Http\Controllers\PostsController@index')->name('top');
 Route::get('/search', 'App\Http\Controllers\PostsController@search')->name('search');
 
 // 投稿
-Route::resource('posts', 'App\Http\Controllers\PostsController', ['only' => ['create', 'store', 'show', 'edit', 'update', 'destroy']];)
+Route::resource('posts', 'App\Http\Controllers\PostsController', ['only' => ['create', 'store', 'show', 'edit', 'update', 'destroy']]);
 
 // コメント
 Route::resource('comments', 'App\Http\Controllers\CommentsController', ['only' => ['store', 'edit', 'update', 'destroy']]);
