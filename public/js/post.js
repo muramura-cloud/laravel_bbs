@@ -1,7 +1,4 @@
-console.log(document.getElementsByName('search_name'));
-
-console.log(document.getElementsByName('search_name')[0].checked);
-
+//検索項目切り替え
 document.getElementsByName('search_name')[0].addEventListener('click', function () {
     if (document.getElementsByName('search_name')[0].checked) {
         document.getElementById('keyword_input').placeholder = '投稿者名キーワード';

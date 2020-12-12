@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Route;
 
 // トップページ
 Route::get('/', 'App\Http\Controllers\PostsController@index')->name('top');
-// Route::post('/search', 'App\Http\Controllers\PostsController@search')->name('search');
 Route::get('/search', 'App\Http\Controllers\PostsController@search')->name('search');
 
 // 投稿
@@ -33,6 +32,9 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
 // 管理者ページ
 // これは投稿やコメントと同じ感じのルーティングにできないの？
 Route::get('/admin', 'App\Http\Controllers\AdminController@index')->name('admin_top');
+Route::get('/admin/search/{title?}/{body?}', 'App\Http\Controllers\AdminController@search');
+// Route::get('/admin/search/{title?}/{body?}/{user_name?}', 'App\Http\Controllers\AdminController@search')->name('admin_search');
+Route::get('/admin/search', 'App\Http\Controllers\AdminController@search');
 Route::get('/admin_comment/{post_id}', 'App\Http\Controllers\AdminController@showComments');
 Route::post('/admin_delete', 'App\Http\Controllers\AdminController@destroy');
 Route::post('/admin_mult_delete', 'App\Http\Controllers\AdminController@multDestroy');

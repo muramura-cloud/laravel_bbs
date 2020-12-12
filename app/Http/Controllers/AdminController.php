@@ -87,4 +87,35 @@ class AdminController extends Controller
 
         return view('admin.showComments', ['post' => $post]);
     }
+
+    public function search(Request $request)
+    {
+        $post_query = Post::query();
+
+        $keywords = [
+            'title' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['title']),
+            'body' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['body']),
+        ];
+
+        $posts = Post::where(function ($post_query) use ($keywords) {
+            foreach ($keywords as $col_name => $value) {
+                $post_query->where($col_name, 'LIKE', "%{$value}%");
+            }
+        })->orderBy('created_at', 'desc')->get();
+
+        foreach ($posts as $post) {
+            $post['has_comments'] = false;
+            $post['_token'] = $request['_token'];
+
+            if ($post->comments->count()) {
+                $post['has_comments'] = true;
+            }
+
+            if (!empty($post->img)) {
+                $post['img'] = asset('storage/' . $post->img);
+            }
+        }
+
+        return response()->json($posts);
+    }
 }

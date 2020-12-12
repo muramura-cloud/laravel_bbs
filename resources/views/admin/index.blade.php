@@ -3,8 +3,53 @@
 @section('content')
 
 <div class="container mt-4">
-    {{-- formをformで括ると大変なことになる。jsでform要素を全て取得できなかった。 --}}
-    <table class="table table-bordered">
+    <button type="button" class="btn btn-outline-success" data-toggle="modal"
+        data-target="#exampleModalCenter">投稿を検索する</button>
+    <br><br>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <form class="form-inline my-2 my-lg-0" method="get" action="{{route('search')}}">
+                @csrf
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalCenterTitle">検索条件を指定</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <fieldset class="mb-4">
+                            <div class="form-group mb-4 d-flex justify-content-between">
+                                <label for="keyword_title"><strong>タイトル</strong></label>
+                                <input id="keyword_title" class="form-control mr-sm-2" type="text" name="keyword_title"
+                                    placeholder="タイトル" aria-label="Search">
+                            </div>
+                            <div class="form-group mb-4 d-flex justify-content-between">
+                                <label for="keyword_body"><strong>本文</strong></label>
+                                <input id="keyword_body" class="form-control mr-sm-2" type="text" name="keyword_body"
+                                    placeholder="本文" aria-label="Search">
+                            </div>
+                            <div class="form-group d-flex justify-content-between">
+                                <label for="keyword_user_name"><strong>投稿者名</strong></label>
+                                <input id="keyword_user_name" class="form-control mr-sm-2" type="text"
+                                    name="keyword_user_name" placeholder="投稿者名" aria-label="Search">
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+                        <button id="admin_search_btn" class="btn btn-outline-success" type="button">検索</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <table id="posts_table" class="table table-bordered">
         <thead class="thead-dark">
             <tr>
                 <th scope="col"><input class="btn btn-danger" type="button" style="width: 80px;" id="all_check_btn"
@@ -18,7 +63,7 @@
                 <th scope="col"></th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="posts_tbody">
             @foreach ($posts as $post)
             <tr>
                 <th scope="row"><input type="checkbox" name="delete_checkbox" value="{{$post->id}}"></th>
@@ -59,11 +104,11 @@
         <input type="hidden" id="ids" name="post_ids[]" value="">
         <button id="mult_delete_btn" class="btn btn-danger">チェックした投稿を削除</button>
     </form>
+    <div class="mt-5">
+        <a class="btn btn-secondary" href="{{ route('admin_top') }}">戻る</a>
+    </div>
 </div>
 <div class="d-flex justify-content-center mb-5">
     {{ $posts->links() }}
 </div>
-{{-- sweetalert.jsライブラリ --}}
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-<script src="{{ asset('js/admin.js') }}"></script>
 @endsection
