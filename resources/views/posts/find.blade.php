@@ -1,5 +1,12 @@
 @extends('layouts.layout')
 
+{{-- 本当はヘルパークラス（Helpers/Helper.php）をパラメーター生成で使いたいけど、なぜか、独自ヘルパークラスがうまく読み込めなくて、仕方なくここでパラメーターを作る。 --}}
+@php
+$url=parse_url(request()->fullUrl());
+parse_str($url['query'], $params);
+print_r($params);
+@endphp
+
 @section('content')
 
 <div class="container mt-4">
@@ -23,6 +30,7 @@
 
                     <input type="hidden" name="page" value="{{$posts->currentPage()}}">
                     <input type="hidden" name="keyword" value="{{$keyword}}">
+                    <input type="hidden" name="do_name_search" value="{{$do_name_search}}">
                     <button class="btn btn-success">続きを読む</button>
                 </form>
             </div>
@@ -41,7 +49,7 @@
     @empty
     <p>検索に一致する投稿はありません。</p>
     @endforelse
-    
+
     @if (!empty($posts))
     <div class="d-flex justify-content-center mb-5">
         {{ $posts->links() }}

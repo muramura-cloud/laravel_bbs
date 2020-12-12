@@ -83,4 +83,3 @@ document.getElementById('mult_delete_btn').addEventListener('click', function (e
         });
     }
 });
-

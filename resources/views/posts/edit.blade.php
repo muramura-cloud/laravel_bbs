@@ -1,13 +1,20 @@
 @extends('layouts.layout')
 
+{{-- 本当はヘルパークラス（Helpers/Helper.php）をパラメーター生成で使いたいけど、なぜか、独自ヘルパークラスがうまく読み込めなくて、仕方なくここでパラメーターを作る。 --}}
+@php
+$url=parse_url(request()->fullUrl());
+parse_str($url['query'], $params);
+$params['post']=$post->id;
+print_r($params);
+@endphp
+
 @section('content')
 <div class="container">
     <div class="border p-4">
         <h1 class="h5 mb-4">投稿の編集</h1>
 
         {{-- htmlのフォームがput送信に対応していないからpostになっているけど、laravelでプtに直している。 --}}
-        <form action="{{route('posts.update',['post'=>$post->id,'page'=>$page,'keyword'=>$keyword])}}" method="post"
-            enctype="multipart/form-data">
+        <form action="{{route('posts.update',$params)}}" method="post" enctype="multipart/form-data">
             @csrf
             @method('put')
 
@@ -59,8 +66,7 @@
                 </div>
 
                 <div class="mt-5">
-                    <a class="btn btn-secondary"
-                        href="{{ route('posts.show', ['post' => $post,'page'=>$page, 'keyword'=>$keyword]) }}">キャンセル</a>
+                    <a class="btn btn-secondary" href="{{ route('posts.show', $params) }}">キャンセル</a>
                     <button type="submit" class="btn btn-primary">更新する</button>
                 </div>
             </fieldset>

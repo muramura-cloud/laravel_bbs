@@ -12,15 +12,15 @@
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <a class="navbar-brand" href="{{ url('') }}">Laravel BBS</a>
             {{-- jsが必要 --}}
-            {{-- <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
-            </button> --}}
+            </button>
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
-                        <a class="nav-link" href="/">トップページ<span class="sr-only">(current)</span></a>
+                        <a class="nav-link" href="{{route('top')}}">トップページ<span class="sr-only">(current)</span></a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link disabled" href="{{route('dashboard')}}">Disabled</a>
@@ -32,8 +32,14 @@
                 <form class="form-inline my-2 my-lg-0" method="get" action="{{route('search')}}">
                     @csrf
 
-                    <input class="form-control mr-sm-2" type="text" name="keyword" placeholder="検索ワード"
-                        aria-label="Search">
+                    <div class="custom-control custom-checkbox text-light mr-2">
+                        <input type="checkbox" name="search_name" value="1" class="custom-control-input"
+                            id="custom-check-3">
+                        <label class="custom-control-label" for="custom-check-3">投稿者で検索</label>
+                    </div>
+                    <input type="hidden" id="do_name_search" name="do_name_search" value="0">
+                    <input id="keyword_input" class="form-control mr-sm-2" type="text" name="keyword"
+                        placeholder="検索ワード" aria-label="Search">
                     <button class="btn btn-outline-success my-2 my-sm-0 mr-3" type="submit">検索</button>
                 </form>
                 <div>
@@ -57,6 +63,17 @@
         <div>
             @yield('content')
         </div>
+
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+            integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous">
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+        </script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+            integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous">
+        </script>
+        <script src="{{ asset('js/post.js') }}"></script>
     </body>
 
 </html>

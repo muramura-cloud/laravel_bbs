@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\PostRequest;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
-use App\lib\My_func;
+use App\Helpers\Helper;
 
 class PostsController extends Controller
 {
@@ -64,7 +65,15 @@ class PostsController extends Controller
 
         $post = Post::findOrFail($post_id);
 
-        return view('posts.show', ['post' => $post, 'page' => $request->page, 'user' => $user, 'keyword' => $request->keyword]);
+        $params = [
+            'post' => $post,
+            'page' => $request->page,
+            'user' => $user,
+            'keyword' => $request->keyword,
+            'do_name_search' => $request->do_name_search
+        ];
+
+        return view('posts.show', $params);
     }
 
     public function edit($post_id, Request $request)
@@ -76,7 +85,15 @@ class PostsController extends Controller
 
         $post = Post::findOrFail($post_id);
 
-        return view('posts.edit', ['post' => $post, 'user' => $user, 'page' => $request->page, 'keyword' => $request->keyword]);
+        $params = [
+            'post' => $post,
+            'page' => $request->page,
+            'user' => $user,
+            'keyword' => $request->keyword,
+            'do_name_search' => $request->do_name_search
+        ];
+
+        return view('posts.edit', $params);
     }
 
     public function update($post_id, PostRequest $request)
@@ -103,7 +120,14 @@ class PostsController extends Controller
 
         $post->fill($params)->save();
 
-        return redirect()->route('posts.show', ['post' => $post, 'page' => $request->page, 'keyword' => $request->keyword]);
+        $params = [
+            'post' => $post,
+            'page' => $request->page,
+            'keyword' => $request->keyword,
+            'do_name_search' => $request->do_name_search
+        ];
+
+        return redirect()->route('posts.show', $params);
     }
 
     public function destroy($post_id, Request $request)
@@ -133,18 +157,38 @@ class PostsController extends Controller
             $user = Auth::user();
         }
 
-        $query = Post::query();
+        $post_query = Post::query();
+        $user_query = User::query();
 
         $keyword = preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['keyword']);
 
         $posts = [];
-        if (!empty($keyword)) {
-            $query->where('title', 'LIKE', "%{$keyword}%")
-                ->orWhere('body', 'LIKE', "%{$keyword}%")->get();
 
-            $posts = $query->paginate(10);
+        if (!empty($keyword)) {
+            if ($request->do_name_search === '1') {
+                $users = $user_query->where('name', 'LIKE', "%{$keyword}%")->get();
+
+                foreach ($users as $user) {
+                    $post_query->where('user_id', $user->id)->get();
+                }
+
+                $posts = $post_query->paginate(10);
+            } else {
+                $post_query->where('title', 'LIKE', "%{$keyword}%")
+                    ->orWhere('body', 'LIKE', "%{$keyword}%")->get();
+
+                $posts = $post_query->paginate(10);
+            }
         }
 
-        return view('posts.find', ['posts' => $posts, 'user' => $user, 'page' => (int) $request->page, 'keyword' => $keyword]);
+        $params = [
+            'posts' => $posts,
+            'user' => $user,
+            'page' => (int) $request->page,
+            'keyword' => $keyword,
+            'do_name_search' => $request->do_name_search,
+        ];
+
+        return view('posts.find', $params);
     }
 }

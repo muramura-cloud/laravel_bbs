@@ -7,7 +7,6 @@ use App\Models\Post;
 use App\Models\Comment;
 use App\Http\Requests\CommentRequest;
 use Illuminate\Support\Facades\Auth;
-use App\lib\My_func;
 
 class CommentsController extends Controller
 {
@@ -24,7 +23,14 @@ class CommentsController extends Controller
         // ただし、createメソッドを使う場合はモデルのプロパティにguarded(ブラックリスト)あるいはfillable（ホワイトリスト）を設定する必要がある。
         $post->comments()->create($params);
 
-        return redirect()->route('posts.show', ['post' => $post, 'page' => $request->page, 'keyword' => $request->keyword]);
+        $params = [
+            'post' => $post,
+            'page' => $request->page,
+            'keyword' => $request->keyword,
+            'do_name_search' => $request->do_name_search,
+        ];
+
+        return redirect()->route('posts.show', $params);
     }
 
     public function edit($comment_id, Request $request)
@@ -34,8 +40,6 @@ class CommentsController extends Controller
             $user = Auth::user();
         }
 
-        // $userがnullだったらトップページにリダイレクトさせた用が良くない?
-
         $comment = Comment::findOrFail($comment_id);
 
         $params = [
@@ -43,7 +47,8 @@ class CommentsController extends Controller
             'post' => $comment->getPost(),
             'user' => $user,
             'page' => $request->page,
-            'keyword' => $request->keyword
+            'keyword' => $request->keyword,
+            'do_name_search' => $request->do_name_search,
         ];
 
         return view('comments.edit', $params);
@@ -59,7 +64,14 @@ class CommentsController extends Controller
 
         $comment->fill($params)->save();
 
-        return redirect()->route('posts.show', ['post' => $comment->getPost(), 'page' => $request->page, 'keyword' => $request->keyword]);
+        $params = [
+            'post' => $comment->getPost(),
+            'page' => $request->page,
+            'keyword' => $request->keyword,
+            'do_name_search' => $request->do_name_search,
+        ];
+
+        return redirect()->route('posts.show', $params);
     }
 
     public function destroy($comment_id, Request $request)
@@ -68,6 +80,13 @@ class CommentsController extends Controller
 
         $comment->delete();
 
-        return redirect()->route('posts.show', ['post' => $comment->getPost(), 'page' => $request->page, 'keyword' => $request->keyword]);
+        $params = [
+            'post' => $comment->getPost(),
+            'page' => $request->page,
+            'keyword' => $request->keyword,
+            'do_name_search' => $request->do_name_search,
+        ];
+
+        return redirect()->route('posts.show', $params);
     }
 }

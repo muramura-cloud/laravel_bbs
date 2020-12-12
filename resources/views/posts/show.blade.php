@@ -1,5 +1,14 @@
 @extends('layouts.layout')
 
+{{-- 本当はヘルパークラス（Helpers/Helper.php）をパラメーター生成で使いたいけど、なぜか、独自ヘルパークラスがうまく読み込めなくて、仕方なくここでパラメーターの配列を作る。 --}}
+@php
+$url=parse_url(request()->fullUrl());
+parse_str($url['query'], $params);
+$params['post']=$post->id;
+print_r($params);
+@endphp
+
+
 @section('content')
 <div class="container mt-4">
     <div class="border p-4">
@@ -22,12 +31,12 @@
         @auth
         @if ($post->user_id === $user->id)
         <div class="mb-4 text-left">
-            <a class="btn btn-primary"
-                href="{{ route('posts.edit', ['post' => $post->id,'page'=>$page,'keyword'=>$keyword]) }}">編集</a>
+            <a class="btn btn-primary" href="{{ route('posts.edit', $params) }}">編集</a>
             <form style="display: inline-block;" method="POST"
                 action="{{ route('posts.destroy', ['post' => $post->id]) }}">
                 <input type="hidden" name="page" value="{{$page}}">
                 <input type="hidden" name="keyword" value="{{$keyword}}">
+                <input type="hidden" name="do_name_search" value="{{$do_name_search}}">
                 @csrf
                 @method('DELETE')
 
@@ -43,6 +52,7 @@
             <input type="hidden" name="post_id" value="{{$post->id}}">
             <input type="hidden" name="page" value="{{$page}}">
             <input type="hidden" name="keyword" value="{{$keyword}}">
+            <input type="hidden" name="do_name_search" value="{{$do_name_search}}">
             <div class="form-group">
                 <label for="body"><strong>本文(必須)</strong></label>
                 <textarea name="body" class="form-control {{$errors->has('body') ? 'is-invalid' : ''}}" rows="4">{{old('body')}}
@@ -71,12 +81,14 @@
                 @auth
                 @if ($comment->user_id === $user->id)
                 <div class="mb-4 text-right">
+                    {{-- もうちょっとここら辺スッキリさせたいな。 --}}
                     <a class="btn btn-primary p-1"
-                        href="{{ route('comments.edit', ['comment' => $comment->id,'page'=>$page,'keyword'=>$keyword]) }}"><small>編集</small></a>
+                        href="{{ route('comments.edit', ['comment' => $comment->id,'page'=>$page,'keyword'=>$keyword,'do_name_search'=>$do_name_search]) }}"><small>編集</small></a>
                     <form style="display: inline-block;" method="POST"
                         action="{{ route('comments.destroy', ['comment' => $comment->id]) }}">
                         <input type="hidden" name="page" value="{{$page}}">
                         <input type="hidden" name="keyword" value="{{$keyword}}">
+                        <input type="hidden" name="do_name_search" value="{{$do_name_search}}">
                         @csrf
                         @method('DELETE')
 
@@ -92,9 +104,11 @@
         </section>
     </div>
 
+    {{-- ここの条件分岐もいらないかもな --}}
     @if (!empty($keyword))
     <div class="mt-5">
-        <a class="btn btn-secondary" href="{{ route('search',['page'=>$page,'keyword'=>$keyword]) }}">戻る</a>
+        <a class="btn btn-secondary" href="{{ route('search',$params) }}">戻る</a>
+        {{-- <a class="btn btn-secondary" href="{{ route('search',['page'=>$page,'keyword'=>$keyword]) }}">戻る</a> --}}
     </div>
     @else
     <div class="mt-5">
