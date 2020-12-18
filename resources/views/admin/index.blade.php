@@ -101,14 +101,21 @@
     <form id="admin_mult_delete_form" style="display: inline-block;" method="post" action="/admin_mult_delete">
         @csrf
 
-        <input type="hidden" id="ids" name="post_ids[]" value="">
+        <input type="hidden" id="ids" name="post_ids" value="">
         <button id="mult_delete_btn" class="btn btn-danger">チェックした投稿を削除</button>
     </form>
+
+    {{-- これ管理者トップページのときに表示されてたらおかしい。 --}}
     <div class="mt-5">
-        <a class="btn btn-secondary" href="{{ route('admin_top') }}">戻る</a>
+        <a class="btn btn-secondary" href="{{ route('admin_top') }}">管理者トップへ</a>
     </div>
 </div>
-<div class="d-flex justify-content-center mb-5">
+
+{{-- ここももしかしたら必要に応じてjsで構築するかもしれない。 --}}
+{{-- $posts->links()はpagination/tailwind.blade.phpを表示している。 --}}
+<div id="pagination_btns" class="d-flex justify-content-center mb-5">
     {{ $posts->links() }}
 </div>
+{{-- 現在ページを --}}
+<input type="hidden" id="current_page" value="{{$posts->currentPage()}}">
 @endsection

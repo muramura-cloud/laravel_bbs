@@ -7,20 +7,31 @@ use App\Models\Post;
 use App\Models\Comment;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
-use App\lib\My_func;
 
 class AdminController extends Controller
 {
     public function index()
     {
-        $posts = Post::with(['comments'])->orderBy('created_at', 'desc')->paginate(20);
+        $posts = Post::with(['comments'])->orderBy('created_at', 'desc')->paginate(10);
 
         return view('admin.index', ['posts' => $posts]);
     }
 
+    public function showComments($post_id)
+    {
+        $post = Post::findOrFail($post_id);
+
+        $comments = $post->comments()->paginate(10);
+
+        return view('admin.showComments', ['post' => $post, 'comments' => $comments]);
+    }
+
+    // 投稿が消された時に、例えば、２ページ目の投稿を見てた時に、そのにページ全ての投稿が表示されることになる。
+    // ではなく、まず、キーワードに一致する全ての投稿を取得する。そして、現在のページを取得する。そして、現在のページに適した量の投稿を表示するようにするべき。
     public function destroy(Request $request)
     {
         $post = Post::findOrFail($request['post_id']);
+
 
         if (!empty($post->img)) {
             Storage::delete($post->img);
@@ -31,15 +42,38 @@ class AdminController extends Controller
             $post->delete();
         });
 
+        // 投稿を削除した後も元々のページにあったキーワードで再度レコードを取得してビューに流す。
+        $keywords = [
+            'title' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['title']),
+            'body' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['body']),
+        ];
 
-        return redirect()->route('admin_top');
+        $posts = Post::where(function ($post_query) use ($keywords) {
+            foreach ($keywords as $col_name => $value) {
+                $post_query->where($col_name, 'LIKE', "%{$value}%");
+            }
+        })->orderBy('created_at', 'desc')->paginate(10, ['*'], 'page', (int) $request['current_page']);
+
+        foreach ($posts as $post) {
+            $post['has_comments'] = false;
+            $post['_token'] = $request['_token'];
+            $post['keywords'] = $keywords;
+
+            if ($post->comments->count()) {
+                $post['has_comments'] = true;
+            }
+
+            if (!empty($post->img)) {
+                $post['img'] = asset('storage/' . $post->img);
+            }
+        }
+
+        return response()->json($posts);
     }
 
     public function multDestroy(Request $request)
     {
-        $post_ids = $request['post_ids'];
-
-        foreach ($post_ids as $post_id) {
+        foreach ($request['post_ids'] as $post_id) {
             $post = Post::findOrFail((int) $post_id);
 
             if (!empty($post->img)) {
@@ -52,46 +86,6 @@ class AdminController extends Controller
             });
         }
 
-        return redirect()->route('admin_top');
-    }
-
-    public function showComments($post_id)
-    {
-        $post = Post::findOrFail($post_id);
-
-        return view('admin.showComments', ['post' => $post]);
-    }
-
-    public function commentDestroy(Request $request)
-    {
-        $comment = Comment::findOrFail($request['comment_id']);
-
-        $comment->delete();
-
-        return view('admin.showComments', ['post' => $comment->getPost()]);
-    }
-
-    public function commentMultDestroy(Request $request)
-    {
-        $post = Post::findOrFail($request['post_id']);
-
-        $comment_ids = $request['comment_ids'];
-
-        foreach ($comment_ids as $comment_id) {
-            $comment = Comment::findOrFail((int) $comment_id);
-
-            DB::transaction(function () use ($comment) {
-                $comment->delete();
-            });
-        }
-
-        return view('admin.showComments', ['post' => $post]);
-    }
-
-    public function search(Request $request)
-    {
-        $post_query = Post::query();
-
         $keywords = [
             'title' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['title']),
             'body' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['body']),
@@ -101,11 +95,70 @@ class AdminController extends Controller
             foreach ($keywords as $col_name => $value) {
                 $post_query->where($col_name, 'LIKE', "%{$value}%");
             }
-        })->orderBy('created_at', 'desc')->get();
+        })->orderBy('created_at', 'desc')->paginate(10, ['*'], 'page', (int) $request['current_page']);
 
         foreach ($posts as $post) {
             $post['has_comments'] = false;
             $post['_token'] = $request['_token'];
+            $post['keywords'] = $keywords;
+
+            if ($post->comments->count()) {
+                $post['has_comments'] = true;
+            }
+
+            if (!empty($post->img)) {
+                $post['img'] = asset('storage/' . $post->img);
+            }
+        }
+
+        return response()->json($posts);
+    }
+
+    public function commentDestroy(Request $request)
+    {
+        $comment = Comment::findOrFail((int) $request['comment_id']);
+        $post = $comment->getPost();
+
+        $comment->delete();
+
+        return response()->json($post->comments);
+    }
+
+    public function commentMultDestroy(Request $request)
+    {
+        $comment_ids = $request['comment_ids'];
+        $post = Post::findOrFail($request['post_id']);
+
+        foreach ($comment_ids as $comment_id) {
+            $comment = Comment::findOrFail((int) $comment_id);
+
+            DB::transaction(function () use ($comment) {
+                $comment->delete();
+            });
+        }
+
+        return response()->json($post->comments);
+    }
+
+    public function search(Request $request)
+    {
+        $keywords = [
+            'title' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['title']),
+            'body' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['body']),
+        ];
+
+        // 投稿を取得するんだけど送られてきたページ番号をもとに取得する投稿数を調整して欲しい。
+        // もっというとページ〜ネータークラスのcurrent_pageプロパティを送られてきた現在ページで書き換える必要がある。
+        $posts = Post::where(function ($post_query) use ($keywords) {
+            foreach ($keywords as $col_name => $value) {
+                $post_query->where($col_name, 'LIKE', "%{$value}%");
+            }
+        })->orderBy('created_at', 'desc')->paginate(10, ['*'], 'page', (int) $request['page']);
+
+        foreach ($posts as $post) {
+            $post['has_comments'] = false;
+            $post['_token'] = $request['_token'];
+            $post['keywords'] = $keywords;
 
             if ($post->comments->count()) {
                 $post['has_comments'] = true;

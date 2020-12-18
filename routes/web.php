@@ -33,8 +33,6 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
 // これは投稿やコメントと同じ感じのルーティングにできないの？
 Route::get('/admin', 'App\Http\Controllers\AdminController@index')->name('admin_top');
 Route::get('/admin/search/{title?}/{body?}', 'App\Http\Controllers\AdminController@search');
-// Route::get('/admin/search/{title?}/{body?}/{user_name?}', 'App\Http\Controllers\AdminController@search')->name('admin_search');
-Route::get('/admin/search', 'App\Http\Controllers\AdminController@search');
 Route::get('/admin_comment/{post_id}', 'App\Http\Controllers\AdminController@showComments');
 Route::post('/admin_delete', 'App\Http\Controllers\AdminController@destroy');
 Route::post('/admin_mult_delete', 'App\Http\Controllers\AdminController@multDestroy');

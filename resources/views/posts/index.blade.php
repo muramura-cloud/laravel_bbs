@@ -8,7 +8,7 @@
             投稿を新規作成する
         </a>
     </div>
-    
+
     @foreach ($posts as $post)
     <div class="card mb-4">
         @if (!empty($post->img))
@@ -31,8 +31,9 @@
             </div>
         </div>
         <div class="card-footer">
-            <span class="mr-2">投稿日時 : {{$post->created_at->format('Y.m.d')}}
-                {{$post->user ? ' 投稿者 : ' . $post->user->name : ''}}</span>
+            {{-- 一時的に --}}
+            {{-- <span class="mr-2">投稿日時 : {{$post->created_at->format('Y.m.d')}}
+                {{$post->user ? ' 投稿者 : ' . $post->user->name : ''}}</span> --}}
 
             @if ($post->comments->count())
             <span class="badge badge-primary">
