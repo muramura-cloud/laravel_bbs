@@ -17,10 +17,17 @@ class AdminController extends Controller
         return view('admin.index', ['posts' => $posts]);
     }
 
-    public function showComments($post_id)
+    public function showComments($post_id = null, Request $request)
     {
-        $post = Post::findOrFail($post_id);
+        // 普通に遷移させるのかAjaxなのかで処理を分岐させれば良い。
+        if ($request['ajax']) {
+            $post = Post::findOrFail((int) $request['post_id']);
+            $comments = $post->comments()->paginate(10, ['*'], 'page', (int) $request['page']);
 
+            return response()->json($comments);
+        }
+
+        $post = Post::findOrFail($post_id);
         $comments = $post->comments()->paginate(10);
 
         return view('admin.showComments', ['post' => $post, 'comments' => $comments]);
@@ -31,7 +38,6 @@ class AdminController extends Controller
     public function destroy(Request $request)
     {
         $post = Post::findOrFail($request['post_id']);
-
 
         if (!empty($post->img)) {
             Storage::delete($post->img);
@@ -121,7 +127,9 @@ class AdminController extends Controller
 
         $comment->delete();
 
-        return response()->json($post->comments);
+        $comments = $post->comments()->paginate(10, ['*'], 'page', (int) $request['current_page']);
+
+        return response()->json($comments);
     }
 
     public function commentMultDestroy(Request $request)
@@ -137,7 +145,9 @@ class AdminController extends Controller
             });
         }
 
-        return response()->json($post->comments);
+        $comments = $post->comments()->paginate(10, ['*'], 'page', (int) $request['current_page']);
+
+        return response()->json($comments);
     }
 
     public function search(Request $request)

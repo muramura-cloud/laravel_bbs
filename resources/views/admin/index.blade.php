@@ -80,7 +80,7 @@
                 </td>
                 <td>
                     @if ($post->comments->count())
-                    <a href="/admin_comment/{{$post->id}}" class="btn">コメント一覧へ</a>
+                    <a href="/admin_comment/{{$post->id}}" name="show_comments_btn" class="btn">コメント一覧へ</a>
                     @else
                     コメント無し
                     @endif

@@ -39,18 +39,35 @@ function setUpPaginationBtns() {
 
             let link = $(this).attr('href');
 
+            // デフォルトは投稿表示
+            let show_content = 'post';
+            let url = '/admin/search/';
+            let data = {
+                'page': link.slice(link.indexOf('?page=') + 6),
+                'title': $('#keyword_title').val(),
+                'body': $('#keyword_body').val(),
+                '_token': $('meta[name="csrf-token"]').attr('content'),
+            };
+
+            // コメント表示の場合
+            if (location.pathname.indexOf('admin_comment') > -1) {
+                show_content = 'comment';
+                url = '/admin_comment/';
+                data = {
+                    'page': link.slice(link.indexOf('?page=') + 6),
+                    'post_id': location.pathname.replace('/admin_comment/', ''),
+                    'ajax': true,
+                    '_token': $('meta[name="csrf-token"]').attr('content'),
+                };
+            }
+
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 type: 'GET',
-                url: '/admin/search/',
-                data: {
-                    'page': link.slice(link.indexOf('?page=') + 6),
-                    'title': $('#keyword_title').val(),
-                    'body': $('#keyword_body').val(),
-                    '_token': $('meta[name="csrf-token"]').attr('content'),
-                },
+                url: url,
+                data: data,
                 dataType: 'json',
             }).done(function (data) {
                 let html;
@@ -59,50 +76,72 @@ function setUpPaginationBtns() {
                 console.log(data);
 
                 $.each(data.data, function (index, value) {
-                    let id = value.id;
-                    let title = value.title;
-                    let body = value.body;
-                    let img = value.img;
-                    let has_comments = value.has_comments;
-                    let created_at = new Date(value.created_at).toLocaleString();
-                    let _token = value._token;
-                    let keywords = value.keywords;
+                    if (show_content === 'post') {
+                        let id = value.id;
+                        let title = value.title;
+                        let body = value.body;
+                        let img = value.img;
+                        let has_comments = value.has_comments;
+                        let created_at = new Date(value.created_at).toLocaleString();
+                        let _token = value._token;
+                        let keywords = value.keywords;
 
-                    // コメント存在するかどうかを確認する必要がる。それによって表示するコンテンツが変わる。
-                    let a_img = '画像なし';
-                    if (img) {
-                        a_img = '<a href="' + img + '"><img src="' + img + '" style = "width: 40px; height: 30px; " ></a > ';
+                        // コメント存在するかどうかを確認する必要がる。それによって表示するコンテンツが変わる。
+                        let a_img = '画像なし';
+                        if (img) {
+                            a_img = '<a href="' + img + '"><img src="' + img + '" style = "width: 40px; height: 30px; " ></a > ';
+                        }
+
+                        let a_comment = 'コメント無し';
+                        if (has_comments) {
+                            a_comment = '<a href="/admin_comment/' + id + '" class="btn">コメント一覧へ</a > ';
+                        }
+
+                        html += `
+                        <tr>
+                            <th scope="row"><input type="checkbox" name="delete_checkbox" value="${id}"></th>
+                            <td>${id}</td>
+                            <td>${title}</td>
+                            <td>${body}</td>
+                            <td>${a_img}</td>
+                            <td>${a_comment}</td>
+                            <td>${created_at}</td>
+                            <td>
+                                <form name="admin_delete_form" style="display: inline-block;" method="post" action="/admin_delete">
+                                    <input type="hidden" name="_token" value="${_token}">
+                                    <input type="hidden" name="post_id" value="${id}">
+                                    <button name="admin_delete_btn" class="btn btn-danger">削除</button>
+                                </form>
+                            </td>
+                        </tr>
+                        `;
+
+                        // 一応キーワードを持たせておく。
+                        for (let name in keywords) {
+                            html += `<input type="hidden" id="keyword_${name}" value="${keywords[name]}">`;
+                        }
+                    } else if (show_content === 'comment') {
+                        let id = value.id;
+                        let body = value.body;
+                        let created_at = new Date(value.created_at).toLocaleString();
+                        let _token = value._token;
+
+                        html += `
+                        <tr>
+                            <th scope="row"><input type="checkbox" name="delete_checkbox" value="${id}"></th>
+                            <td>${id}</td>
+                            <td>${body}</td>
+                            <td>${created_at}</td>
+                            <td>
+                                <form name="admin_delete_form" style="display: inline-block;" method="post" action="/admin_delete">
+                                    <input type="hidden" name="_token" value="${_token}">
+                                    <input type="hidden" name="post_id" value="${id}">
+                                    <button name="admin_delete_btn" class="btn btn-danger">削除</button>
+                                </form>
+                            </td>
+                        </tr>
+                        `;
                     }
-
-                    let a_comment = 'コメント無し';
-                    if (has_comments) {
-                        a_comment = '<a href="/admin_comment/' + id + '" class="btn">コメント一覧へ</a > ';
-                    }
-
-                    html += `
-                    <tr>
-                        <th scope="row"><input type="checkbox" name="delete_checkbox" value="${id}"></th>
-                        <td>${id}</td>
-                        <td>${title}</td>
-                        <td>${body}</td>
-                        <td>${a_img}</td>
-                        <td>${a_comment}</td>
-                        <td>${created_at}</td>
-                        <td>
-                            <form name="admin_delete_form" style="display: inline-block;" method="post" action="/admin_delete">
-                                <input type="hidden" name="_token" value="${_token}">
-                                <input type="hidden" name="post_id" value="${id}">
-                                <button name="admin_delete_btn" class="btn btn-danger">削除</button>
-                            </form>
-                        </td>
-                    </tr>
-                    `;
-
-                    // 一応キーワードを持たせておく。
-                    for (let name in keywords) {
-                        html += `<input type="hidden" id="keyword_${name}" value="${keywords[name]}">`;
-                    }
-                    // 新しく生成するページの現在ページを更新するのを忘れずに。。
                 });
 
                 console.log(data);
@@ -132,7 +171,7 @@ function setUpPaginationBtns() {
                 // htmlに表示している現在ページも更新しておく。
                 $('#current_page').attr('value', data.current_page);
 
-                setUpSingleDelete();
+                setUpSingleDeleteBtn();
                 setUpMultDeleteBtn();
                 setUpPaginationBtns();
 
@@ -151,7 +190,7 @@ function setUpPaginationBtns() {
 setUpPaginationBtns();
 
 // 単一削除ボタン
-function setUpSingleDelete() {
+function setUpSingleDeleteBtn() {
     let admin_delete_forms = document.getElementsByName('admin_delete_form');
     let admin_delete_btns = document.getElementsByName("admin_delete_btn");
 
@@ -176,6 +215,7 @@ function setUpSingleDelete() {
                 delete_content = 'comment';
                 url = '/admin_comment_delete';
                 data = {
+                    'current_page': document.getElementById('current_page').value,
                     'comment_id': $(this).prev('input').val(),
                     'post_id': location.pathname.replace('/admin_comment/', ''),
                     '_token': $('meta[name="csrf-token"]').attr('content'),
@@ -278,7 +318,7 @@ function setUpSingleDelete() {
 
                         $('#posts_tbody').append(html);
 
-                        setUpSingleDelete();
+                        setUpSingleDeleteBtn();
                         setUpMultDeleteBtn();
 
                         if (data.data.length === 0) {
@@ -296,7 +336,7 @@ function setUpSingleDelete() {
         }, false);
     }
 }
-setUpSingleDelete();
+setUpSingleDeleteBtn();
 
 // まとめて削除
 function setUpMultDeleteBtn() {
@@ -332,6 +372,7 @@ function setUpMultDeleteBtn() {
                 delete_content = 'comment';
                 url = '/admin_mult_comment_delete';
                 data = {
+                    'current_page': document.getElementById('current_page').value,
                     'post_id': location.pathname.replace('/admin_comment/', ''),
                     'comment_ids': delete_ids,
                     '_token': $('meta[name="csrf-token"]').attr('content'),
@@ -430,7 +471,7 @@ function setUpMultDeleteBtn() {
 
                         $('#posts_tbody').append(html);
 
-                        setUpSingleDelete();
+                        setUpSingleDeleteBtn();
                         setUpMultDeleteBtn();
 
                         if (data.data.length === 0) {
@@ -543,7 +584,7 @@ $('#admin_search_btn').on('click', function () {
         // 取得してきたレコードに応じてページネーションも表示
         $('#pagination_btns').append(pagination_btns);
 
-        setUpSingleDelete();
+        setUpSingleDeleteBtn();
         setUpMultDeleteBtn();
         setUpPaginationBtns();
 
