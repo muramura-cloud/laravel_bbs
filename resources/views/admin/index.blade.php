@@ -105,13 +105,11 @@
         <button id="mult_delete_btn" class="btn btn-danger">チェックした投稿を削除</button>
     </form>
 
-    {{-- これ管理者トップページのときに表示されてたらおかしい。 --}}
     <div class="mt-5">
         <a class="btn btn-secondary" href="{{ route('admin_top') }}">管理者トップへ</a>
     </div>
 </div>
 
-{{-- ここももしかしたら必要に応じてjsで構築するかもしれない。 --}}
 {{-- $posts->links()はpagination/tailwind.blade.phpを表示している。 --}}
 <div id="pagination_btns" class="d-flex justify-content-center mb-5">
     {{ $posts->links() }}

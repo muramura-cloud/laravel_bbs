@@ -56,7 +56,7 @@ function setUpPaginationBtns() {
                 data = {
                     'page': link.slice(link.indexOf('?page=') + 6),
                     'post_id': location.pathname.replace('/admin_comment/', ''),
-                    'ajax': true,
+                    'ajax': 'true',
                     '_token': $('meta[name="csrf-token"]').attr('content'),
                 };
             }
@@ -94,7 +94,15 @@ function setUpPaginationBtns() {
 
                         let a_comment = 'コメント無し';
                         if (has_comments) {
-                            a_comment = '<a href="/admin_comment/' + id + '" class="btn">コメント一覧へ</a > ';
+                            let url = `/admin_comment/${id}`;
+                            keywords.page = data.current_page;
+                            for (let name in keywords) {
+                                if (!keywords[name]) {
+                                    continue;
+                                }
+                                url = addUrlParam(url, name, keywords[name], true);
+                            }
+                            a_comment = `<a href="${url}" class="btn">コメント一覧へ</a > `;
                         }
 
                         html += `
@@ -116,7 +124,6 @@ function setUpPaginationBtns() {
                         </tr>
                         `;
 
-                        // 一応キーワードを持たせておく。
                         for (let name in keywords) {
                             html += `<input type="hidden" id="keyword_${name}" value="${keywords[name]}">`;
                         }
@@ -267,7 +274,15 @@ function setUpSingleDeleteBtn() {
 
                                 let a_comment = 'コメント無し';
                                 if (has_comments) {
-                                    a_comment = '<a href="/admin_comment/' + id + '" class="btn">コメント一覧へ</a > ';
+                                    let url = `/admin_comment/${id}`;
+                                    keywords.page = data.current_page;
+                                    for (let name in keywords) {
+                                        if (!keywords[name]) {
+                                            continue;
+                                        }
+                                        url = addUrlParam(url, name, keywords[name], true);
+                                    }
+                                    a_comment = `<a href="${url}" class="btn">コメント一覧へ</a > `;
                                 }
 
                                 html += `
@@ -420,7 +435,15 @@ function setUpMultDeleteBtn() {
 
                                 let a_comment = 'コメント無し';
                                 if (has_comments) {
-                                    a_comment = '<a href="/admin_comment/' + id + '" class="btn">コメント一覧へ</a > ';
+                                    let url = `/admin_comment/${id}`;
+                                    keywords.page = data.current_page;
+                                    for (let name in keywords) {
+                                        if (!keywords[name]) {
+                                            continue;
+                                        }
+                                        url = addUrlParam(url, name, keywords[name], true);
+                                    }
+                                    a_comment = `<a href="${url}" class="btn">コメント一覧へ</a > `;
                                 }
 
                                 html += `
@@ -511,6 +534,8 @@ $('#admin_search_btn').on('click', function () {
         let html;
         let pagination_btns = '';
 
+        console.log(data);
+
         // dataにはページネーションオブジェクトが入るので、さらにそこに存在するdataプロパティをまわす
         $.each(data.data, function (index, value) {
             let id = value.id;
@@ -522,15 +547,22 @@ $('#admin_search_btn').on('click', function () {
             let _token = value._token;
             let keywords = value.keywords;
 
-            // コメント存在するかどうかを確認する必要がる。それによって表示するコンテンツが変わる。
             let a_img = '画像なし';
             if (img) {
-                a_img = '<a href="' + img + '"><img src="' + img + '" style = "width: 40px; height: 30px; " ></a > ';
+                a_img = `<a href="${img}"><img src="${img}" style = "width: 40px; height: 30px;"></a >`;
             }
 
             let a_comment = 'コメント無し';
             if (has_comments) {
-                a_comment = '<a href="/admin_comment/' + id + '" class="btn">コメント一覧へ</a > ';
+                let url = `/admin_comment/${id}`;
+                keywords.page = data.current_page;
+                for (let name in keywords) {
+                    if (!keywords[name]) {
+                        continue;
+                    }
+                    url = addUrlParam(url, name, keywords[name], true);
+                }
+                a_comment = `<a href="${url}" class="btn">コメント一覧へ</a > `;
             }
 
             html += `
@@ -552,7 +584,6 @@ $('#admin_search_btn').on('click', function () {
             </tr>
             `;
 
-            // 一応キーワードを持たせておく。
             for (let name in keywords) {
                 html += `<input type="hidden" id="keyword_${name}" value="${keywords[name]}">`;
             }

@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
+    private $per_page = 10;
+
     public function index()
     {
         $posts = Post::with(['comments'])->orderBy('created_at', 'desc')->paginate(10);
@@ -19,16 +21,17 @@ class AdminController extends Controller
 
     public function showComments($post_id = null, Request $request)
     {
-        // 普通に遷移させるのかAjaxなのかで処理を分岐させれば良い。
-        if ($request['ajax']) {
+        // コメント一覧のページネーションで必要。
+        if ($request['ajax'] === 'true') {
             $post = Post::findOrFail((int) $request['post_id']);
-            $comments = $post->comments()->paginate(10, ['*'], 'page', (int) $request['page']);
+            $comments = $post->comments()->paginate($this->per_page, ['*'], 'page', (int) $request['page']);
 
             return response()->json($comments);
         }
 
-        $post = Post::findOrFail($post_id);
-        $comments = $post->comments()->paginate(10);
+        $post = Post::with(['comments'])->findOrFail((int) $post_id);
+        // なんとかこれでうまくいった。なんかページネーターオブジェクト見てみたら、現在ページがなぜか１ページじゃなかったから
+        $comments = $post->comments()->paginate($this->per_page, ['*'], 'page', 1);
 
         return view('admin.showComments', ['post' => $post, 'comments' => $comments]);
     }
@@ -157,13 +160,16 @@ class AdminController extends Controller
             'body' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['body']),
         ];
 
-        // 投稿を取得するんだけど送られてきたページ番号をもとに取得する投稿数を調整して欲しい。
-        // もっというとページ〜ネータークラスのcurrent_pageプロパティを送られてきた現在ページで書き換える必要がある。
         $posts = Post::where(function ($post_query) use ($keywords) {
             foreach ($keywords as $col_name => $value) {
                 $post_query->where($col_name, 'LIKE', "%{$value}%");
             }
-        })->orderBy('created_at', 'desc')->paginate(10, ['*'], 'page', (int) $request['page']);
+        })->orderBy('created_at', 'desc')->paginate($this->per_page, ['*'], 'page', (int) $request['page']);
+
+        // コメント一覧から投稿一覧を表示する
+        if ($request['ajax'] === 'false') {
+            return view('admin.index', ['posts' => $posts, 'keywords' => $keywords, 'page' => $request['page']]);
+        }
 
         foreach ($posts as $post) {
             $post['has_comments'] = false;

@@ -16,7 +16,7 @@
         </thead>
         {{-- これ名前tbodyの方がよくね？ --}}
         <tbody id="posts_tbody">
-            @forelse ($post->comments as $comment)
+            @forelse ($comments as $comment)
             <tr>
                 <th scope="row"><input type="checkbox" name="delete_checkbox" value="{{$comment->id}}"></th>
                 <td>{{$comment->id}}</td>
@@ -46,14 +46,24 @@
         <input type="hidden" name="post_id" value="{{$post->id}}">
         <button id="mult_delete_btn" class="btn btn-danger">チェックしたコメントを削除</button>
     </form>
-    <div class="mt-5">
-        {{-- これページ番号渡さないと戻れないね。 --}}
+    <div class="mt-5 d-flex" id="back_btns">
+        <a id="back_search_result_btn" class="btn btn-secondary mr-2">戻る</a>
         <a class="btn btn-secondary" href="{{ route('admin_top') }}">管理者トップへ戻る</a>
     </div>
 </div>
 <div id="pagination_btns" class="d-flex justify-content-center mb-5">
     {{ $comments->links() }}
 </div>
-{{-- 現在ページを --}}
+{{-- 現在ページ--}}
 <input type="hidden" id="current_page" value="{{$comments->currentPage()}}">
 @endsection
+
+<script>
+    window.onload = function(){
+        if(location.search) {
+            document.getElementById("back_search_result_btn").setAttribute('href',`/admin/search/${location.search}&ajax=false`)
+        }else {
+            document.getElementById("back_search_result_btn").remove();
+        }
+    };
+</script>

@@ -45,7 +45,7 @@
         </script>
         {{-- sweetalert.jsライブラリ --}}
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-        {{-- <script src="{{mix('js/app.js') }}"></script> --}}
+        <script src="{{ asset('js/functions.js') }}"></script>
         <script src="{{ asset('js/admin.js') }}"></script>
     </body>
 
