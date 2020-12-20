@@ -1,4 +1,12 @@
 // sweetalert.jsを使用
+let options = {
+    text: '本当に削除しますか？',
+    buttons: {
+        ok: '削除する',
+        cancel: 'キャンセル',
+    }
+};
+
 
 // 全選択ボタン 
 function setUpMultCheckBtn() {
@@ -29,7 +37,6 @@ setUpMultCheckBtn();
 function setUpPaginationBtns() {
     let pagination_btns = document.getElementsByName("pagination_btn");
 
-    console.log(pagination_btns);
     for (var i = 0; i < pagination_btns.length; i++) {
         pagination_btns[i].addEventListener("click", function (e) {
             e.preventDefault();
@@ -71,115 +78,21 @@ function setUpPaginationBtns() {
                 dataType: 'json',
             }).done(function (data) {
                 let html;
-                let pagination_btns = '';
-
-                console.log(data);
 
                 $.each(data.data, function (index, value) {
                     if (show_content === 'post') {
-                        let id = value.id;
-                        let title = value.title;
-                        let body = value.body;
-                        let img = value.img;
-                        let has_comments = value.has_comments;
-                        let created_at = new Date(value.created_at).toLocaleString();
-                        let _token = value._token;
-                        let keywords = value.keywords;
-
-                        // コメント存在するかどうかを確認する必要がる。それによって表示するコンテンツが変わる。
-                        let a_img = '画像なし';
-                        if (img) {
-                            a_img = '<a href="' + img + '"><img src="' + img + '" style = "width: 40px; height: 30px; " ></a > ';
-                        }
-
-                        let a_comment = 'コメント無し';
-                        if (has_comments) {
-                            let url = `/admin_comment/${id}`;
-                            keywords.page = data.current_page;
-                            for (let name in keywords) {
-                                if (!keywords[name]) {
-                                    continue;
-                                }
-                                url = addUrlParam(url, name, keywords[name], true);
-                            }
-                            a_comment = `<a href="${url}" class="btn">コメント一覧へ</a > `;
-                        }
-
-                        html += `
-                        <tr>
-                            <th scope="row"><input type="checkbox" name="delete_checkbox" value="${id}"></th>
-                            <td>${id}</td>
-                            <td>${title}</td>
-                            <td>${body}</td>
-                            <td>${a_img}</td>
-                            <td>${a_comment}</td>
-                            <td>${created_at}</td>
-                            <td>
-                                <form name="admin_delete_form" style="display: inline-block;" method="post" action="/admin_delete">
-                                    <input type="hidden" name="_token" value="${_token}">
-                                    <input type="hidden" name="post_id" value="${id}">
-                                    <button name="admin_delete_btn" class="btn btn-danger">削除</button>
-                                </form>
-                            </td>
-                        </tr>
-                        `;
-
-                        for (let name in keywords) {
-                            html += `<input type="hidden" id="keyword_${name}" value="${keywords[name]}">`;
-                        }
+                        html += getPostHtml(value, data);
                     } else if (show_content === 'comment') {
-                        let id = value.id;
-                        let body = value.body;
-                        let created_at = new Date(value.created_at).toLocaleString();
-                        let _token = value._token;
-
-                        html += `
-                        <tr>
-                            <th scope="row"><input type="checkbox" name="delete_checkbox" value="${id}"></th>
-                            <td>${id}</td>
-                            <td>${body}</td>
-                            <td>${created_at}</td>
-                            <td>
-                                <form name="admin_delete_form" style="display: inline-block;" method="post" action="/admin_delete">
-                                    <input type="hidden" name="_token" value="${_token}">
-                                    <input type="hidden" name="post_id" value="${id}">
-                                    <button name="admin_delete_btn" class="btn btn-danger">削除</button>
-                                </form>
-                            </td>
-                        </tr>
-                        `;
+                        html += getCommentHtml(value);
                     }
                 });
 
-                console.log(data);
-                pagination_btns += '<nav><ul class="pagination">';
-                for (let index in data.links) {
-                    if (Number(index) === 0 && data.current_page === 1) {
-                        continue;
-                    }
-
-                    if (Number(index) === data.links.length - 1 && data.current_page === data.last_page) {
-                        continue
-                    }
-
-                    if (data.links[index].label === data.current_page) {
-                        pagination_btns += `<li class="page-item active" aria-current="page"><span class="page-link">${data.links[index].label}</span></li>`;
-                    } else {
-                        pagination_btns += `<li class="page-item"><a name="pagination_btn" class="page-link" href="${data.links[index].url}">${data.links[index].label}</a></li>`;
-                    }
-                }
-                pagination_btns += '</ul></nav>';
-
-                // 取得してきたレコードを表示
                 $('#posts_tbody').append(html);
-                // 取得してきたレコードに応じてページネーションも表示
-                $('#pagination_btns').append(pagination_btns);
-
-                // htmlに表示している現在ページも更新しておく。
+                $('#pagination_btns').append(getPaginationBtns(data));
                 $('#current_page').attr('value', data.current_page);
 
-                setUpSingleDeleteBtn();
-                setUpMultDeleteBtn();
+                setUpSingleDeleteBtn(options);
+                setUpMultDeleteBtn(options);
                 setUpPaginationBtns();
 
                 if (data.length === 0) {
@@ -197,7 +110,7 @@ function setUpPaginationBtns() {
 setUpPaginationBtns();
 
 // 単一削除ボタン
-function setUpSingleDeleteBtn() {
+function setUpSingleDeleteBtn(options) {
     let admin_delete_forms = document.getElementsByName('admin_delete_form');
     let admin_delete_btns = document.getElementsByName("admin_delete_btn");
 
@@ -209,7 +122,7 @@ function setUpSingleDeleteBtn() {
             let delete_content = 'post';
             let url = '/admin_delete';
             let data = {
-                'current_page': document.getElementById('current_page').value,
+                'page': document.getElementById('current_page').value,
                 'title': $('#keyword_title').val(),
                 'body': $('#keyword_body').val(),
                 // これが多分取れてない。
@@ -222,20 +135,13 @@ function setUpSingleDeleteBtn() {
                 delete_content = 'comment';
                 url = '/admin_comment_delete';
                 data = {
-                    'current_page': document.getElementById('current_page').value,
+                    'page': document.getElementById('current_page').value,
                     'comment_id': $(this).prev('input').val(),
                     'post_id': location.pathname.replace('/admin_comment/', ''),
                     '_token': $('meta[name="csrf-token"]').attr('content'),
                 };
             }
 
-            var options = {
-                text: '本当に削除しますか？',
-                buttons: {
-                    ok: '削除する',
-                    cancel: 'キャンセル',
-                }
-            };
             swal(options).then(function (value) {
                 if (value) {
                     // これpostsいらない。
@@ -252,89 +158,18 @@ function setUpSingleDeleteBtn() {
                     }).done(function (data) {
                         let html;
 
-                        // コメントページネーションも考えてね・
                         $.each(data.data, function (index, value) {
                             if (delete_content === 'post') {
-                                console.log(value);
-
-                                let id = value.id;
-                                let title = value.title;
-                                let body = value.body;
-                                let img = value.img;
-                                let has_comments = value.has_comments;
-                                let created_at = new Date(value.created_at).toLocaleString();
-                                let _token = value._token;
-                                let keywords = value.keywords;
-
-                                // コメント存在するかどうかを確認する必要がる。それによって表示するコンテンツが変わる。
-                                let a_img = '画像なし';
-                                if (img) {
-                                    a_img = '<a href="' + img + '"><img src="' + img + '" style = "width: 40px; height: 30px; " ></a > ';
-                                }
-
-                                let a_comment = 'コメント無し';
-                                if (has_comments) {
-                                    let url = `/admin_comment/${id}`;
-                                    keywords.page = data.current_page;
-                                    for (let name in keywords) {
-                                        if (!keywords[name]) {
-                                            continue;
-                                        }
-                                        url = addUrlParam(url, name, keywords[name], true);
-                                    }
-                                    a_comment = `<a href="${url}" class="btn">コメント一覧へ</a > `;
-                                }
-
-                                html += `
-                                <tr>
-                                    <th scope="row"><input type="checkbox" name="delete_checkbox" value="${id}"></th>
-                                    <td>${id}</td>
-                                    <td>${title}</td>
-                                    <td>${body}</td>
-                                    <td>${a_img}</td>
-                                    <td>${a_comment}</td>
-                                    <td>${created_at}</td>
-                                    <td>
-                                        <form name="admin_delete_form" style="display: inline-block;" method="post" action="/admin_delete">
-                                            <input type="hidden" name="_token" value="${_token}">
-                                            <input type="hidden" name="post_id" value="${id}">
-                                            <button name="admin_delete_btn" class="btn btn-danger">削除</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                `;
-
-                                for (let name in keywords) {
-                                    html += `<input type="hidden" id="keyword_${name}" value="${keywords[name]}">`;
-                                }
+                                html += getPostHtml(value, data);
                             } else if (delete_content === 'comment') {
-                                let id = value.id;
-                                let body = value.body;
-                                let created_at = new Date(value.created_at).toLocaleString();
-                                let _token = value._token;
-
-                                html += `
-                                <tr>
-                                    <th scope="row"><input type="checkbox" name="delete_checkbox" value="${id}"></th>
-                                    <td>${id}</td>
-                                    <td>${body}</td>
-                                    <td>${created_at}</td>
-                                    <td>
-                                        <form name="admin_delete_form" style="display: inline-block;" method="post" action="/admin_delete">
-                                            <input type="hidden" name="_token" value="${_token}">
-                                            <input type="hidden" name="post_id" value="${id}">
-                                            <button name="admin_delete_btn" class="btn btn-danger">削除</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                `;
+                                html += getCommentHtml(value);
                             }
                         });
 
                         $('#posts_tbody').append(html);
 
-                        setUpSingleDeleteBtn();
-                        setUpMultDeleteBtn();
+                        setUpSingleDeleteBtn(options);
+                        setUpMultDeleteBtn(options);
 
                         if (data.data.length === 0) {
                             $('#posts_table').after('<p class="text-center mt-5 search-null">検索に一致する投稿は存在しません。</p>');
@@ -351,10 +186,10 @@ function setUpSingleDeleteBtn() {
         }, false);
     }
 }
-setUpSingleDeleteBtn();
+setUpSingleDeleteBtn(options);
 
-// まとめて削除
-function setUpMultDeleteBtn() {
+// まとめて削除ボタン
+function setUpMultDeleteBtn(options) {
     document.getElementById('mult_delete_btn').addEventListener('click', function (e) {
         e.preventDefault();
 
@@ -375,7 +210,7 @@ function setUpMultDeleteBtn() {
             let delete_content = 'post';
             let url = '/admin_mult_delete';
             let data = {
-                'current_page': document.getElementById('current_page').value,
+                'page': document.getElementById('current_page').value,
                 'title': $('#keyword_title').val(),
                 'body': $('#keyword_body').val(),
                 'post_ids': delete_ids,
@@ -387,20 +222,13 @@ function setUpMultDeleteBtn() {
                 delete_content = 'comment';
                 url = '/admin_mult_comment_delete';
                 data = {
-                    'current_page': document.getElementById('current_page').value,
+                    'page': document.getElementById('current_page').value,
                     'post_id': location.pathname.replace('/admin_comment/', ''),
                     'comment_ids': delete_ids,
                     '_token': $('meta[name="csrf-token"]').attr('content'),
                 };
             }
 
-            var options = {
-                text: '本当に削除しますか？',
-                buttons: {
-                    ok: '削除する',
-                    cancel: 'キャンセル',
-                }
-            };
             swal(options).then(function (value) {
                 if (value) {
                     $('#posts_tbody').empty();
@@ -418,84 +246,16 @@ function setUpMultDeleteBtn() {
 
                         $.each(data.data, function (index, value) {
                             if (delete_content === 'post') {
-                                let id = value.id;
-                                let title = value.title;
-                                let body = value.body;
-                                let img = value.img;
-                                let has_comments = value.has_comments;
-                                let created_at = new Date(value.created_at).toLocaleString();
-                                let _token = value._token;
-                                let keywords = value.keywords;
-
-                                // コメント存在するかどうかを確認する必要がる。それによって表示するコンテンツが変わる。
-                                let a_img = '画像なし';
-                                if (img) {
-                                    a_img = '<a href="' + img + '"><img src="' + img + '" style = "width: 40px; height: 30px; " ></a > ';
-                                }
-
-                                let a_comment = 'コメント無し';
-                                if (has_comments) {
-                                    let url = `/admin_comment/${id}`;
-                                    keywords.page = data.current_page;
-                                    for (let name in keywords) {
-                                        if (!keywords[name]) {
-                                            continue;
-                                        }
-                                        url = addUrlParam(url, name, keywords[name], true);
-                                    }
-                                    a_comment = `<a href="${url}" class="btn">コメント一覧へ</a > `;
-                                }
-
-                                html += `
-                                <tr>
-                                    <th scope="row"><input type="checkbox" name="delete_checkbox" value="${id}"></th>
-                                    <td>${id}</td>
-                                    <td>${title}</td>
-                                    <td>${body}</td>
-                                    <td>${a_img}</td>
-                                    <td>${a_comment}</td>
-                                    <td>${created_at}</td>
-                                    <td>
-                                        <form name="admin_delete_form" style="display: inline-block;" method="post" action="/admin_delete">
-                                            <input type="hidden" name="_token" value="${_token}">
-                                            <input type="hidden" name="post_id" value="${id}">
-                                            <button name="admin_delete_btn" class="btn btn-danger">削除</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                `;
-
-                                for (let name in keywords) {
-                                    html += `<input type="hidden" id="keyword_${name}" value="${keywords[name]}">`;
-                                }
+                                html += getPostHtml(value, data);
                             } else if (delete_content === 'comment') {
-                                let id = value.id;
-                                let body = value.body;
-                                let created_at = new Date(value.created_at).toLocaleString();
-                                let _token = value._token;
-
-                                html += `
-                                <tr>
-                                    <th scope="row"><input type="checkbox" name="delete_checkbox" value="${id}"></th>
-                                    <td>${id}</td>
-                                    <td>${body}</td>
-                                    <td>${created_at}</td>
-                                    <td>
-                                        <form name="admin_delete_form" style="display: inline-block;" method="post" action="/admin_delete">
-                                            <input type="hidden" name="_token" value="${_token}">
-                                            <input type="hidden" name="post_id" value="${id}">
-                                            <button name="admin_delete_btn" class="btn btn-danger">削除</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                `;
+                                html += getCommentHtml(value);
                             }
                         });
 
                         $('#posts_tbody').append(html);
 
-                        setUpSingleDeleteBtn();
-                        setUpMultDeleteBtn();
+                        setUpSingleDeleteBtn(options);
+                        setUpMultDeleteBtn(options);
 
                         if (data.data.length === 0) {
                             $('#posts_table').after('<p class="text-center mt-5 search-null">検索に一致する投稿は存在しません。</p>');
@@ -511,9 +271,9 @@ function setUpMultDeleteBtn() {
         }
     });
 }
-setUpMultDeleteBtn();
+setUpMultDeleteBtn(options);
 
-//検索
+//投稿検索
 $('#admin_search_btn').on('click', function () {
     $('#posts_tbody').empty();
     $('#pagination_btns').empty();
@@ -532,91 +292,17 @@ $('#admin_search_btn').on('click', function () {
         dataType: 'json',
     }).done(function (data) {
         let html;
-        let pagination_btns = '';
-
-        console.log(data);
 
         // dataにはページネーションオブジェクトが入るので、さらにそこに存在するdataプロパティをまわす
         $.each(data.data, function (index, value) {
-            let id = value.id;
-            let title = value.title;
-            let body = value.body;
-            let img = value.img;
-            let has_comments = value.has_comments;
-            let created_at = new Date(value.created_at).toLocaleString();
-            let _token = value._token;
-            let keywords = value.keywords;
-
-            let a_img = '画像なし';
-            if (img) {
-                a_img = `<a href="${img}"><img src="${img}" style = "width: 40px; height: 30px;"></a >`;
-            }
-
-            let a_comment = 'コメント無し';
-            if (has_comments) {
-                let url = `/admin_comment/${id}`;
-                keywords.page = data.current_page;
-                for (let name in keywords) {
-                    if (!keywords[name]) {
-                        continue;
-                    }
-                    url = addUrlParam(url, name, keywords[name], true);
-                }
-                a_comment = `<a href="${url}" class="btn">コメント一覧へ</a > `;
-            }
-
-            html += `
-            <tr>
-                <th scope="row"><input type="checkbox" name="delete_checkbox" value="${id}"></th>
-                <td>${id}</td>
-                <td>${title}</td>
-                <td>${body}</td>
-                <td>${a_img}</td>
-                <td>${a_comment}</td>
-                <td>${created_at}</td>
-                <td>
-                    <form name="admin_delete_form" style="display: inline-block;" method="post" action="/admin_delete">
-                        <input type="hidden" name="_token" value="${_token}">
-                        <input type="hidden" name="post_id" value="${id}">
-                        <button name="admin_delete_btn" class="btn btn-danger">削除</button>
-                    </form>
-                </td>
-            </tr>
-            `;
-
-            for (let name in keywords) {
-                html += `<input type="hidden" id="keyword_${name}" value="${keywords[name]}">`;
-            }
+            html += getPostHtml(value, data);
         });
 
-        // コントローラーにおそら現在ページを送信しなければいけない。
-        // このボタンを押すと、ajaxでページ番号が送信されて、コントローラーで表示するコンテンツを用意してまた、ビューに流す。
-        console.log(data);
-        pagination_btns += '<nav><ul class="pagination">';
-        for (let index in data.links) {
-            if (Number(index) === 0 && data.current_page === 1) {
-                continue;
-            }
-
-            if (Number(index) === data.links.length - 1 && data.current_page === data.last_page) {
-                continue
-            }
-
-            if (data.links[index].label === data.current_page) {
-                pagination_btns += `<li class="page-item active" aria-current="page"><span class="page-link">${data.links[index].label}</span></li>`;
-            } else {
-                pagination_btns += `<li class="page-item"><a name="pagination_btn" class="page-link" href="${data.links[index].url}">${data.links[index].label}</a></li>`;
-            }
-        }
-        pagination_btns += '</ul></nav>';
-
-        // 取得してきたレコードを表示
         $('#posts_tbody').append(html);
-        // 取得してきたレコードに応じてページネーションも表示
-        $('#pagination_btns').append(pagination_btns);
+        $('#pagination_btns').append(getPaginationBtns(data));
 
-        setUpSingleDeleteBtn();
-        setUpMultDeleteBtn();
+        setUpSingleDeleteBtn(options);
+        setUpMultDeleteBtn(options);
         setUpPaginationBtns();
 
         if (data.length === 0) {
@@ -629,3 +315,8 @@ $('#admin_search_btn').on('click', function () {
         console.log("errorThrown    : " + errorThrown.message); // 例外情報
     });
 });
+
+//コメント検索
+// $('#comment_search_btn').on('click' function () {
+
+// })

@@ -19,6 +19,13 @@ class AdminController extends Controller
         return view('admin.index', ['posts' => $posts]);
     }
 
+    public function comment()
+    {
+        $comments = Comment::paginate(10);
+
+        return view('admin.comment', ['comments' => $comments]);
+    }
+
     public function showComments($post_id = null, Request $request)
     {
         // コメント一覧のページネーションで必要。
@@ -51,33 +58,7 @@ class AdminController extends Controller
             $post->delete();
         });
 
-        // 投稿を削除した後も元々のページにあったキーワードで再度レコードを取得してビューに流す。
-        $keywords = [
-            'title' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['title']),
-            'body' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['body']),
-        ];
-
-        $posts = Post::where(function ($post_query) use ($keywords) {
-            foreach ($keywords as $col_name => $value) {
-                $post_query->where($col_name, 'LIKE', "%{$value}%");
-            }
-        })->orderBy('created_at', 'desc')->paginate(10, ['*'], 'page', (int) $request['current_page']);
-
-        foreach ($posts as $post) {
-            $post['has_comments'] = false;
-            $post['_token'] = $request['_token'];
-            $post['keywords'] = $keywords;
-
-            if ($post->comments->count()) {
-                $post['has_comments'] = true;
-            }
-
-            if (!empty($post->img)) {
-                $post['img'] = asset('storage/' . $post->img);
-            }
-        }
-
-        return response()->json($posts);
+        return response()->json($this->getSearchedPosts($request));
     }
 
     public function multDestroy(Request $request)
@@ -95,32 +76,7 @@ class AdminController extends Controller
             });
         }
 
-        $keywords = [
-            'title' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['title']),
-            'body' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['body']),
-        ];
-
-        $posts = Post::where(function ($post_query) use ($keywords) {
-            foreach ($keywords as $col_name => $value) {
-                $post_query->where($col_name, 'LIKE', "%{$value}%");
-            }
-        })->orderBy('created_at', 'desc')->paginate(10, ['*'], 'page', (int) $request['current_page']);
-
-        foreach ($posts as $post) {
-            $post['has_comments'] = false;
-            $post['_token'] = $request['_token'];
-            $post['keywords'] = $keywords;
-
-            if ($post->comments->count()) {
-                $post['has_comments'] = true;
-            }
-
-            if (!empty($post->img)) {
-                $post['img'] = asset('storage/' . $post->img);
-            }
-        }
-
-        return response()->json($posts);
+        return response()->json($this->getSearchedPosts($request));
     }
 
     public function commentDestroy(Request $request)
@@ -130,17 +86,14 @@ class AdminController extends Controller
 
         $comment->delete();
 
-        $comments = $post->comments()->paginate(10, ['*'], 'page', (int) $request['current_page']);
-
-        return response()->json($comments);
+        return response()->json($post->comments()->paginate(10, ['*'], 'page', (int) $request['current_page']));
     }
 
     public function commentMultDestroy(Request $request)
     {
-        $comment_ids = $request['comment_ids'];
         $post = Post::findOrFail($request['post_id']);
 
-        foreach ($comment_ids as $comment_id) {
+        foreach ($request['comment_ids'] as $comment_id) {
             $comment = Comment::findOrFail((int) $comment_id);
 
             DB::transaction(function () use ($comment) {
@@ -148,12 +101,27 @@ class AdminController extends Controller
             });
         }
 
-        $comments = $post->comments()->paginate(10, ['*'], 'page', (int) $request['current_page']);
-
-        return response()->json($comments);
+        return response()->json($post->comments()->paginate(10, ['*'], 'page', (int) $request['current_page']));
     }
 
     public function search(Request $request)
+    {
+        $posts = $this->getSearchedPosts($request);
+
+        $keywords = [
+            'title' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['title']),
+            'body' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['body']),
+        ];
+        // コメント一覧から投稿一覧を表示する
+        if ($request['ajax'] === 'false') {
+            return view('admin.index', ['posts' => $posts, 'keywords' => $keywords, 'page' => $request['page']]);
+        }
+
+        return response()->json($posts);
+    }
+
+    // これ多分引数でキーワードを受け取ったほうが汎用的になる。
+    private function getSearchedPosts($request)
     {
         $keywords = [
             'title' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['title']),
@@ -166,11 +134,7 @@ class AdminController extends Controller
             }
         })->orderBy('created_at', 'desc')->paginate($this->per_page, ['*'], 'page', (int) $request['page']);
 
-        // コメント一覧から投稿一覧を表示する
-        if ($request['ajax'] === 'false') {
-            return view('admin.index', ['posts' => $posts, 'keywords' => $keywords, 'page' => $request['page']]);
-        }
-
+        // jsにおくるデータにページ遷移に必要なデータとトークンを加える。
         foreach ($posts as $post) {
             $post['has_comments'] = false;
             $post['_token'] = $request['_token'];
@@ -185,6 +149,6 @@ class AdminController extends Controller
             }
         }
 
-        return response()->json($posts);
+        return $posts;
     }
 }

@@ -3,9 +3,12 @@
 @section('content')
 
 <div class="container mt-4">
-    <button type="button" class="btn btn-outline-success" data-toggle="modal"
-        data-target="#exampleModalCenter">投稿を検索する</button>
-    <br><br>
+    <div class="d-flex">
+        <button type="button" class="btn btn-outline-success mr-2" data-toggle="modal"
+            data-target="#exampleModalCenter">投稿を検索する</button>
+        <a href="{{route('admin_comment_list')}}" class="btn btn-outline-info">コメント一覧へ</a>
+    </div>
+    <br>
 
     <!-- Modal -->
     <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
@@ -32,11 +35,6 @@
                                 <label for="keyword_body"><strong>本文</strong></label>
                                 <input id="keyword_body" class="form-control mr-sm-2" type="text" name="keyword_body"
                                     placeholder="本文" aria-label="Search">
-                            </div>
-                            <div class="form-group d-flex justify-content-between">
-                                <label for="keyword_user_name"><strong>投稿者名</strong></label>
-                                <input id="keyword_user_name" class="form-control mr-sm-2" type="text"
-                                    name="keyword_user_name" placeholder="投稿者名" aria-label="Search">
                             </div>
                         </fieldset>
                     </div>
