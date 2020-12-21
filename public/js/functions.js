@@ -54,7 +54,7 @@ function addUrlParam(path, key, value, save) {
     return fullPath;
 };
 
-//投稿表示のhtml
+//投稿表示のhtml paginate_dataにはコントラーラーのページネーターオブジェクトが入る。
 function getPostHtml(value, paginate_data) {
     let html = '';
 

@@ -4,11 +4,10 @@
 
 <div class="container mt-4">
     <div class="d-flex">
-        <a class="btn btn-secondary mr-2" href="{{ route('admin_top') }}">戻る</a>
         <form class="form-inline my-2 my-lg-0" method="get" action="{{route('search')}}">
             @csrf
 
-            <input id="keyword_input" class="form-control mr-sm-2" type="text" name="keyword" placeholder="検索ワード"
+            <input id="keyword_body" class="form-control mr-sm-2" type="text" name="keyword" placeholder="検索ワード"
                 aria-label="Search">
             <button id="comment_search_btn" class="btn btn-outline-success my-2 my-sm-0 mr-3" type="button">検索</button>
         </form>
@@ -58,6 +57,7 @@
     </form>
 
     <div class="mt-5">
+        <a class="btn btn-secondary mr-2" href="{{ route('admin_comment_list') }}">コメント一覧へ</a>
         <a class="btn btn-secondary" href="{{ route('admin_top') }}">管理者トップへ</a>
     </div>
 </div>

@@ -43,8 +43,6 @@ class AdminController extends Controller
         return view('admin.showComments', ['post' => $post, 'comments' => $comments]);
     }
 
-    // 投稿が消された時に、例えば、２ページ目の投稿を見てた時に、そのにページ全ての投稿が表示されることになる。
-    // ではなく、まず、キーワードに一致する全ての投稿を取得する。そして、現在のページを取得する。そして、現在のページに適した量の投稿を表示するようにするべき。
     public function destroy(Request $request)
     {
         $post = Post::findOrFail($request['post_id']);
@@ -79,20 +77,26 @@ class AdminController extends Controller
         return response()->json($this->getSearchedPosts($request));
     }
 
+    // 投稿検索ページでもこのメソッド使うから、getSearchedComments()を分岐で呼び出せるようにする
     public function commentDestroy(Request $request)
     {
         $comment = Comment::findOrFail((int) $request['comment_id']);
-        $post = $comment->getPost();
 
+        if ($request['show_comment_list']) {
+            $comment->delete();
+
+            return response()->json($this->getSearchedComments($request));
+        }
+
+        $post = $comment->getPost();
         $comment->delete();
 
+        // マルチをそうだけど、これ$request['current_page']ってちゃんと値取れてる？$request['page']な気がするけど。多分最初のトップページに行った時にバグる気がする。
         return response()->json($post->comments()->paginate(10, ['*'], 'page', (int) $request['current_page']));
     }
 
     public function commentMultDestroy(Request $request)
     {
-        $post = Post::findOrFail($request['post_id']);
-
         foreach ($request['comment_ids'] as $comment_id) {
             $comment = Comment::findOrFail((int) $comment_id);
 
@@ -100,6 +104,12 @@ class AdminController extends Controller
                 $comment->delete();
             });
         }
+
+        if ($request['show_comment_list']) {
+            return response()->json($this->getSearchedComments($request));
+        }
+
+        $post = Post::findOrFail($request['post_id']);
 
         return response()->json($post->comments()->paginate(10, ['*'], 'page', (int) $request['current_page']));
     }
@@ -118,6 +128,13 @@ class AdminController extends Controller
         }
 
         return response()->json($posts);
+    }
+
+    public function comment_search(Request $request)
+    {
+        $comments = $this->getSearchedComments($request);
+
+        return response()->json($comments);
     }
 
     // これ多分引数でキーワードを受け取ったほうが汎用的になる。
@@ -150,5 +167,27 @@ class AdminController extends Controller
         }
 
         return $posts;
+    }
+
+    // どのテーブル引数に指定するだけで良いのでは？
+    private function getSearchedComments($request)
+    {
+        $keywords = [
+            'body' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['body']),
+        ];
+
+        $comments = Comment::where(function ($post_query) use ($keywords) {
+            foreach ($keywords as $col_name => $value) {
+                $post_query->where($col_name, 'LIKE', "%{$value}%");
+            }
+        })->orderBy('created_at', 'desc')->paginate($this->per_page, ['*'], 'page', (int) $request['page']);
+
+        // jsにおくるデータにページ遷移に必要なデータとトークンを加える。
+        foreach ($comments as $comment) {
+            $comment['_token'] = $request['_token'];
+            $comment['keywords'] = $keywords;
+        }
+
+        return $comments;
     }
 }

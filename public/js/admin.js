@@ -1,4 +1,5 @@
-// sweetalert.jsを使用
+// sweetalert.jsのアラートメッセージで使用
+// functions.jsを使用
 let options = {
     text: '本当に削除しますか？',
     buttons: {
@@ -6,7 +7,6 @@ let options = {
         cancel: 'キャンセル',
     }
 };
-
 
 // 全選択ボタン 
 function setUpMultCheckBtn() {
@@ -34,7 +34,7 @@ function setUpMultCheckBtn() {
 setUpMultCheckBtn();
 
 //ページネーションボタン
-function setUpPaginationBtns() {
+function setUpPaginationBtns(options) {
     let pagination_btns = document.getElementsByName("pagination_btn");
 
     for (var i = 0; i < pagination_btns.length; i++) {
@@ -44,9 +44,8 @@ function setUpPaginationBtns() {
             $('#posts_tbody').empty();
             $('#pagination_btns').empty();
 
-            let link = $(this).attr('href');
-
             // デフォルトは投稿表示
+            let link = $(this).attr('href');
             let show_content = 'post';
             let url = '/admin/search/';
             let data = {
@@ -56,7 +55,7 @@ function setUpPaginationBtns() {
                 '_token': $('meta[name="csrf-token"]').attr('content'),
             };
 
-            // コメント表示の場合
+            // 投稿に紐づくコメント表示の場合
             if (location.pathname.indexOf('admin_comment') > -1) {
                 show_content = 'comment';
                 url = '/admin_comment/';
@@ -66,6 +65,15 @@ function setUpPaginationBtns() {
                     'ajax': 'true',
                     '_token': $('meta[name="csrf-token"]').attr('content'),
                 };
+                // コメント検索の場合
+                if (location.pathname.indexOf('admin_comment_list') > -1) {
+                    url = '/admin/comment_search/';
+                    data = {
+                        'page': link.slice(link.indexOf('?page=') + 6),
+                        'body': $('#keyword_body').val(),
+                        '_token': $('meta[name="csrf-token"]').attr('content'),
+                    };
+                }
             }
 
             $.ajax({
@@ -93,9 +101,10 @@ function setUpPaginationBtns() {
 
                 setUpSingleDeleteBtn(options);
                 setUpMultDeleteBtn(options);
-                setUpPaginationBtns();
+                setUpPaginationBtns(options);
 
-                if (data.length === 0) {
+                // これコメントがの場合はどうなる？
+                if (data.data.length === 0) {
                     $('#posts_table').after('<p class="text-center mt-5 search-null">検索に一致する投稿は存在しません。</p>');
                 }
             }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -107,7 +116,7 @@ function setUpPaginationBtns() {
         }, false);
     }
 }
-setUpPaginationBtns();
+setUpPaginationBtns(options);
 
 // 単一削除ボタン
 function setUpSingleDeleteBtn(options) {
@@ -125,7 +134,6 @@ function setUpSingleDeleteBtn(options) {
                 'page': document.getElementById('current_page').value,
                 'title': $('#keyword_title').val(),
                 'body': $('#keyword_body').val(),
-                // これが多分取れてない。
                 'post_id': $(this).prev('input').val(),
                 '_token': $('meta[name="csrf-token"]').attr('content'),
             };
@@ -140,6 +148,16 @@ function setUpSingleDeleteBtn(options) {
                     'post_id': location.pathname.replace('/admin_comment/', ''),
                     '_token': $('meta[name="csrf-token"]').attr('content'),
                 };
+
+                if (location.pathname.indexOf('admin_comment_list') > -1) {
+                    data = {
+                        'show_comment_list': true,
+                        'body': $('#keyword_body').val(),
+                        'page': document.getElementById('current_page').value,
+                        'comment_id': $(this).prev('input').val(),
+                        '_token': $('meta[name="csrf-token"]').attr('content'),
+                    };
+                }
             }
 
             swal(options).then(function (value) {
@@ -148,9 +166,7 @@ function setUpSingleDeleteBtn(options) {
                     $('#posts_tbody').empty();
 
                     $.ajax({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
+                        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                         type: 'POST',
                         url: url,
                         data: data,
@@ -227,6 +243,16 @@ function setUpMultDeleteBtn(options) {
                     'comment_ids': delete_ids,
                     '_token': $('meta[name="csrf-token"]').attr('content'),
                 };
+
+                if (location.pathname.indexOf('admin_comment_list') > -1) {
+                    data = {
+                        'show_comment_list': true,
+                        'body': $('#keyword_body').val(),
+                        'page': document.getElementById('current_page').value,
+                        'comment_ids': delete_ids,
+                        '_token': $('meta[name="csrf-token"]').attr('content'),
+                    };
+                }
             }
 
             swal(options).then(function (value) {
@@ -234,9 +260,7 @@ function setUpMultDeleteBtn(options) {
                     $('#posts_tbody').empty();
 
                     $.ajax({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
+                        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                         type: 'POST',
                         url: url,
                         data: data,
@@ -303,9 +327,9 @@ $('#admin_search_btn').on('click', function () {
 
         setUpSingleDeleteBtn(options);
         setUpMultDeleteBtn(options);
-        setUpPaginationBtns();
+        setUpPaginationBtns(options);
 
-        if (data.length === 0) {
+        if (data.data.length === 0) {
             $('#posts_table').after('<p class="text-center mt-5 search-null">投稿が見つかりません</p>');
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -317,6 +341,42 @@ $('#admin_search_btn').on('click', function () {
 });
 
 //コメント検索
-// $('#comment_search_btn').on('click' function () {
+$('#comment_search_btn').on('click', function () {
+    $('#posts_tbody').empty();
+    $('#pagination_btns').empty();
 
-// })
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'GET',
+        url: '/admin/comment_search/',
+        data: {
+            'body': $('#keyword_body').val(),
+            '_token': $('meta[name="csrf-token"]').attr('content'),
+        },
+        dataType: 'json',
+    }).done(function (data) {
+        let html;
+
+        $.each(data.data, function (index, value) {
+            html += getCommentHtml(value);
+        });
+
+        $('#posts_tbody').append(html);
+        $('#pagination_btns').append(getPaginationBtns(data));
+
+        setUpSingleDeleteBtn(options);
+        setUpMultDeleteBtn(options);
+        setUpPaginationBtns(options);
+
+        if (data.data.length === 0) {
+            $('#posts_table').after('<p class="text-center mt-5 search-null">コメントが見つかりません</p>');
+        }
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        console.log("ajax通信に失敗しました");
+        console.log("jqXHR          : " + jqXHR.status); // HTTPステータスが取得
+        console.log("textStatus     : " + textStatus);    // タイムアウト、パースエラー
+        console.log("errorThrown    : " + errorThrown.message); // 例外情報
+    });
+});
