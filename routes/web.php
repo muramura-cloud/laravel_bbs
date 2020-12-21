@@ -30,7 +30,6 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
 })->name('dashboard');
 
 // 管理者ページ
-// これは投稿やコメントと同じ感じのルーティングにできないの？
 Route::get('/admin', 'App\Http\Controllers\AdminController@index')->name('admin_top');
 Route::get('/admin_comment_list', 'App\Http\Controllers\AdminController@comment')->name('admin_comment_list');
 Route::get('/admin/search/', 'App\Http\Controllers\AdminController@search');

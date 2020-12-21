@@ -31,15 +31,11 @@
             </div>
         </div>
         <div class="card-footer">
-            {{-- 一時的に --}}
-            {{-- <span class="mr-2">投稿日時 : {{$post->created_at->format('Y.m.d')}}
-                {{$post->user ? ' 投稿者 : ' . $post->user->name : ''}}</span> --}}
-
-            @if ($post->comments->count())
-            <span class="badge badge-primary">
-                コメント {{ $post->comments->count() }}件
-            </span>
-            @endif
+            <span class="mr-2">投稿日時 : {{$post->created_at ? $post->created_at->format('Y.m.d') : ''}}</span>
+            <span
+                class="badge badge-primary">{{$post->comments->count() ? 'コメント'.$post->comments->count().'件':''}}</span>
+            <span class="ml-2 badge badge-info">{{$post->category ? 'カテゴリー :'. $post->category : ''}}</span>
+            <span class="ml-2 badge">{{$post->user ? ' 投稿者 : ' . $post->user->name : ''}}</span>
         </div>
     </div>
     @endforeach

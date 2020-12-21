@@ -44,6 +44,24 @@
                     @endif
                 </div>
 
+                <div class="form-group">
+                    <label for="category"><strong>カテゴリー</strong>(任意)</label><br>
+                    <select class="form-control" id="category" name="category">
+                        <option value="{{null}}">指定なし</option>
+                        <option>マクロ経済学</option>
+                        <option>ミクロ経済学</option>
+                        <option>社会経済学</option>
+                        <option>統計学</option>
+                        <option>経済数学</option>
+                        <option>経営学</option>
+                        <option>会計学</option>
+                        <option>経済史</option>
+                        <option>経済史</option>
+                        <option>簿記</option>
+                        <option>金融</option>
+                        <option>その他</option>
+                    </select>
+                </div>
                 <div class="mt-5">
                     <a class="btn btn-secondary" href="{{ route('top') }}">キャンセル</a>
                     <button type="submit" class="btn btn-primary">投稿する</button>

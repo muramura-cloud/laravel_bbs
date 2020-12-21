@@ -5,7 +5,6 @@
 $url=parse_url(request()->fullUrl());
 parse_str($url['query'], $params);
 $params['post']=$post->id;
-print_r($params);
 @endphp
 
 
@@ -17,6 +16,7 @@ print_r($params);
             <div class="p-2 col-6">
                 <h1 class="h5 mb-4">{{ $post->title }}</h1>
                 <p class="mb-5">{{$post->body}}</p>
+                <p class="mb-5 badge">カテゴリー : {{$post->category ? $post->category:'無し'}}</p>
             </div>
             <div class="p-2 col-6">
                 <a href="{{asset('storage/' . $post->img)}}"><img src="{{asset('storage/' . $post->img)}}"
@@ -26,6 +26,7 @@ print_r($params);
         @else
         <h1 class="h5 mb-4">{{ $post->title }}</h1>
         <p class="mb-5">{{$post->body}}</p>
+        <p class="mb-5 badge">カテゴリー : {{$post->category ? $post->category:'無し'}}</p>
         @endif
 
         @auth
@@ -75,7 +76,7 @@ print_r($params);
             {{-- モデルでリレーションを設定しているからcommentsプロパティを使用できる。 --}}
             @forelse($post->comments as $comment)
             <div class="border-top p-4">
-                <time class="text-secondary">{{ $comment->created_at->format('Y.m.d H:i') }}
+                <time class="text-secondary">{{ $comment->created_at ? $comment->created_at->format('Y.m.d H:i') : '' }}
                     {{$comment->user ? ' コメント主 : ' . $comment->user->name : ''}}</time>
                 <p class="mt-2">{{$comment->body}}</p>
                 @auth

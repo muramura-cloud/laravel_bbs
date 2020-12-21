@@ -77,7 +77,6 @@ class AdminController extends Controller
         return response()->json($this->getSearchedPosts($request));
     }
 
-    // 投稿検索ページでもこのメソッド使うから、getSearchedComments()を分岐で呼び出せるようにする
     public function commentDestroy(Request $request)
     {
         $comment = Comment::findOrFail((int) $request['comment_id']);

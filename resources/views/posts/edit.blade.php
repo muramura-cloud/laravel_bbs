@@ -5,7 +5,6 @@
 $url=parse_url(request()->fullUrl());
 parse_str($url['query'], $params);
 $params['post']=$post->id;
-print_r($params);
 @endphp
 
 @section('content')
@@ -13,7 +12,7 @@ print_r($params);
     <div class="border p-4">
         <h1 class="h5 mb-4">投稿の編集</h1>
 
-        {{-- htmlのフォームがput送信に対応していないからpostになっているけど、laravelでプtに直している。 --}}
+        {{-- htmlのフォームがput送信に対応していないからpostになっているけど、laravelでputに直している。 --}}
         <form action="{{route('posts.update',$params)}}" method="post" enctype="multipart/form-data">
             @csrf
             @method('put')
@@ -39,6 +38,25 @@ print_r($params);
                         {{ $errors->first('body') }}
                     </div>
                     @endif
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_category"><strong>カテゴリー</strong>(任意)</label><br>
+                    <select class="form-control" id="edit_category" name="category" data-category="{{$post->category}}">
+                        <option value="{{null}}">指定なし</option>
+                        <option value="マクロ経済学">マクロ経済学</option>
+                        <option value="ミクロ経済学">ミクロ経済学</option>
+                        <option value="社会経済学">社会経済学</option>
+                        <option value="統計学">統計学</option>
+                        <option value="経済数学">経済数学</option>
+                        <option value="経営学">経営学</option>
+                        <option value="会計学">会計学</option>
+                        <option value="経済史">経済史</option>
+                        <option value="経済史">経済史</option>
+                        <option value="簿記">簿記</option>
+                        <option value="金融">金融</option>
+                        <option value="その他">その他</option>
+                    </select>
                 </div>
 
                 <div class="d-flex">

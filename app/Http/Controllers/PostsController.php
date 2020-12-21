@@ -44,6 +44,7 @@ class PostsController extends Controller
             'title' => $request->title,
             'body' => $request->body,
             'img' => $request->img,
+            'category' => $request->category,
         ];
 
         if (!empty($request->file('img'))) {
@@ -102,6 +103,7 @@ class PostsController extends Controller
             'title' => $request->title,
             'body' => $request->body,
             'img' => $request->img,
+            'category' => $request->category,
         ];
 
         $post = Post::findOrFail($post_id);
@@ -172,12 +174,12 @@ class PostsController extends Controller
                     $post_query->where('user_id', $user->id)->get();
                 }
 
-                $posts = $post_query->paginate(10);
+                $posts = $post_query->orderBy('created_at', 'desc')->paginate(10);
             } else {
                 $post_query->where('title', 'LIKE', "%{$keyword}%")
                     ->orWhere('body', 'LIKE', "%{$keyword}%")->get();
 
-                $posts = $post_query->paginate(10);
+                $posts = $post_query->orderBy('created_at', 'desc')->paginate(10);
             }
         }
 
