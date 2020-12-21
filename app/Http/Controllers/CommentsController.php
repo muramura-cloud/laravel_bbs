@@ -27,6 +27,7 @@ class CommentsController extends Controller
             'post' => $post,
             'page' => $request->page,
             'keyword' => $request->keyword,
+            'category' => $request->category,
             'do_name_search' => $request->do_name_search,
         ];
 
@@ -48,6 +49,7 @@ class CommentsController extends Controller
             'user' => $user,
             'page' => $request->page,
             'keyword' => $request->keyword,
+            'category' => $request->category,
             'do_name_search' => $request->do_name_search,
         ];
 
@@ -68,6 +70,7 @@ class CommentsController extends Controller
             'post' => $comment->getPost(),
             'page' => $request->page,
             'keyword' => $request->keyword,
+            'category' => $request->category,
             'do_name_search' => $request->do_name_search,
         ];
 
@@ -84,6 +87,7 @@ class CommentsController extends Controller
             'post' => $comment->getPost(),
             'page' => $request->page,
             'keyword' => $request->keyword,
+            'category' => $request->category,
             'do_name_search' => $request->do_name_search,
         ];
 

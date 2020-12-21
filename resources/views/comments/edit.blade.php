@@ -5,6 +5,7 @@
 $url=parse_url(request()->fullUrl());
 parse_str($url['query'], $params);
 $params['post']=$post->id;
+$params['category']=$category;
 print_r($params);
 @endphp
 
@@ -18,6 +19,7 @@ print_r($params);
             <input type="hidden" name="post_id" value="{{$comment->post_id}}">
             <input type="hidden" name="page" value="{{$page}}">
             <input type="hidden" name="keyword" value="{{$keyword}}">
+            <input type="hidden" name="category" value="{{$category}}">
             <input type="hidden" name="do_name_search" value="{{$do_name_search}}">
             @csrf
             @method('put')

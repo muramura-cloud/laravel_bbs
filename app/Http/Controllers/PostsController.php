@@ -71,6 +71,7 @@ class PostsController extends Controller
             'page' => $request->page,
             'user' => $user,
             'keyword' => $request->keyword,
+            'category' => $request->category,
             'do_name_search' => $request->do_name_search
         ];
 
@@ -91,6 +92,7 @@ class PostsController extends Controller
             'page' => $request->page,
             'user' => $user,
             'keyword' => $request->keyword,
+            'category' => $request->category,
             'do_name_search' => $request->do_name_search
         ];
 
@@ -126,6 +128,7 @@ class PostsController extends Controller
             'post' => $post,
             'page' => $request->page,
             'keyword' => $request->keyword,
+            'category' => $request->category,
             'do_name_search' => $request->do_name_search
         ];
 
@@ -145,11 +148,18 @@ class PostsController extends Controller
             $post->delete();
         });
 
+        $params = [
+            'page' => $request->page,
+            'keyword' => $request->keyword,
+            'category' => $request->category,
+            'do_name_search' => $request->do_name_search
+        ];
+
         if (!empty($request->keyword)) {
-            return redirect()->route('search', ['page' => (int) $request->page, 'keyword' => $request->keyword]);
+            return redirect()->route('search', $params);
         }
 
-        return redirect()->route('top', ['page' => $request->page]);
+        return redirect()->route('top', ['page' => (int) $request->page]);
     }
 
     public function search(Request $request)
@@ -164,22 +174,40 @@ class PostsController extends Controller
 
         $keyword = preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['keyword']);
 
-        $posts = [];
+        if (!empty($request['category'])) {
+            if (!empty($keyword)) {
+                if ($request->do_name_search === '1') {
+                    $users = $user_query->where('name', 'LIKE', "%{$keyword}%")->get();
 
-        if (!empty($keyword)) {
+                    $posts = Post::where('category', $request['category'])
+                        ->where(function ($query) use ($users) {
+                            foreach ($users as $user) {
+                                $query->orWhere('user_id', $user->id);
+                            }
+                        })->orderBy('created_at', 'desc')->paginate(10);
+                } else {
+                    $posts = Post::where('category', $request['category'])
+                        ->where(function ($query) use ($keyword) {
+                            $query
+                                ->where('title', 'LIKE', "%{$keyword}%")
+                                ->orWhere('body', 'LIKE', "%{$keyword}%");
+                        })->orderBy('created_at', 'desc')->paginate(10);
+                }
+            } else {
+                $posts = $post_query->where('category', $request['category'])->orderBy('created_at', 'desc')->paginate(10);
+            }
+        } elseif (!empty($keyword)) {
             if ($request->do_name_search === '1') {
                 $users = $user_query->where('name', 'LIKE', "%{$keyword}%")->get();
 
-                foreach ($users as $user) {
-                    $post_query->where('user_id', $user->id)->get();
-                }
-
-                $posts = $post_query->orderBy('created_at', 'desc')->paginate(10);
+                $posts = Post::where(function ($query) use ($users) {
+                    foreach ($users as $user) {
+                        $query->orWhere('user_id', $user->id);
+                    }
+                })->orderBy('created_at', 'desc')->paginate(10);
             } else {
-                $post_query->where('title', 'LIKE', "%{$keyword}%")
-                    ->orWhere('body', 'LIKE', "%{$keyword}%")->get();
-
-                $posts = $post_query->orderBy('created_at', 'desc')->paginate(10);
+                $posts = $post_query->where('title', 'LIKE', "%{$keyword}%")
+                    ->orWhere('body', 'LIKE', "%{$keyword}%")->orderBy('created_at', 'desc')->paginate(10);
             }
         }
 
@@ -188,6 +216,7 @@ class PostsController extends Controller
             'user' => $user,
             'page' => (int) $request->page,
             'keyword' => $keyword,
+            'category' => $request['category'],
             'do_name_search' => $request->do_name_search,
         ];
 

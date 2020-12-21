@@ -30,6 +30,7 @@ parse_str($url['query'], $params);
                     <input type="hidden" name="page" value="{{$posts->currentPage()}}">
                     <input type="hidden" name="keyword" value="{{$keyword}}">
                     <input type="hidden" name="do_name_search" value="{{$do_name_search}}">
+                    <input type="hidden" name="category" value="{{$category}}">
                     <button class="btn btn-success">続きを読む</button>
                 </form>
             </div>
@@ -54,5 +55,6 @@ parse_str($url['query'], $params);
     <div class="mt-5">
         <a class="btn btn-secondary" href="{{ route('top',['page'=>$page]) }}">戻る</a>
     </div>
+    <br>
 </div>
 @endsection

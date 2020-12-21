@@ -4,7 +4,9 @@
 @php
 $url=parse_url(request()->fullUrl());
 parse_str($url['query'], $params);
-$params['post']=$post->id;
+$params['post'] = $post->id;
+$params['category'] = $category;
+print_r($params);
 @endphp
 
 
@@ -37,6 +39,7 @@ $params['post']=$post->id;
                 action="{{ route('posts.destroy', ['post' => $post->id]) }}">
                 <input type="hidden" name="page" value="{{$page}}">
                 <input type="hidden" name="keyword" value="{{$keyword}}">
+                <input type="hidden" name="category" value="{{$category}}">
                 <input type="hidden" name="do_name_search" value="{{$do_name_search}}">
                 @csrf
                 @method('DELETE')
@@ -53,6 +56,7 @@ $params['post']=$post->id;
             <input type="hidden" name="post_id" value="{{$post->id}}">
             <input type="hidden" name="page" value="{{$page}}">
             <input type="hidden" name="keyword" value="{{$keyword}}">
+            <input type="hidden" name="category" value="{{$category}}">
             <input type="hidden" name="do_name_search" value="{{$do_name_search}}">
             <div class="form-group">
                 <label for="body"><strong>本文(必須)</strong></label>
@@ -76,19 +80,21 @@ $params['post']=$post->id;
             {{-- モデルでリレーションを設定しているからcommentsプロパティを使用できる。 --}}
             @forelse($post->comments as $comment)
             <div class="border-top p-4">
-                <time class="text-secondary">{{ $comment->created_at ? $comment->created_at->format('Y.m.d H:i') : '' }}
-                    {{$comment->user ? ' コメント主 : ' . $comment->user->name : ''}}</time>
+                <time
+                    class="text-secondary">{{ $comment->created_at ? $comment->created_at->format('Y.m.d H:i') : '' }}</time>
+                <span class="badge">{{$comment->user ? $comment->user->name : ''}}</span>
                 <p class="mt-2">{{$comment->body}}</p>
                 @auth
                 @if ($comment->user_id === $user->id)
                 <div class="mb-4 text-right">
                     {{-- もうちょっとここら辺スッキリさせたいな。 --}}
                     <a class="btn btn-primary p-1"
-                        href="{{ route('comments.edit', ['comment' => $comment->id,'page'=>$page,'keyword'=>$keyword,'do_name_search'=>$do_name_search]) }}"><small>編集</small></a>
+                        href="{{ route('comments.edit', ['comment' => $comment->id,'page'=>$page,'keyword'=>$keyword,'category'=>$category ,'do_name_search'=>$do_name_search]) }}"><small>編集</small></a>
                     <form style="display: inline-block;" method="POST"
                         action="{{ route('comments.destroy', ['comment' => $comment->id]) }}">
                         <input type="hidden" name="page" value="{{$page}}">
                         <input type="hidden" name="keyword" value="{{$keyword}}">
+                        <input type="hidden" name="category" value="{{$category}}">
                         <input type="hidden" name="do_name_search" value="{{$do_name_search}}">
                         @csrf
                         @method('DELETE')
@@ -109,12 +115,12 @@ $params['post']=$post->id;
     @if (!empty($keyword))
     <div class="mt-5">
         <a class="btn btn-secondary" href="{{ route('search',$params) }}">戻る</a>
-        {{-- <a class="btn btn-secondary" href="{{ route('search',['page'=>$page,'keyword'=>$keyword]) }}">戻る</a> --}}
     </div>
     @else
     <div class="mt-5">
         <a class="btn btn-secondary" href="{{ route('top',['page'=>$page]) }}">戻る</a>
     </div>
     @endif
+    <br>
 </div>
 @endsection

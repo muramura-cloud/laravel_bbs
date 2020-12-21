@@ -8,15 +8,3 @@ document.getElementsByName('search_name')[0].addEventListener('click', function 
         document.getElementById('do_name_search').value = 0;
     }
 }, false);
-
-
-// これ他のページでエラーが起きちゃうけど。
-let category = document.getElementById('edit_category');
-if (category.dataset.category) {
-    for (let i = 0; i < category.options.length; i++) {
-        if (category.options.item(i).value === category.dataset.category) {
-            console.log(category.options.item(i));
-            category.options.item(i).selected = true;
-        }
-    }
-}

@@ -32,10 +32,26 @@
                 <form class="form-inline my-2 my-lg-0" method="get" action="{{route('search')}}">
                     @csrf
 
+                    <label for="category" class="mr-2 text-white"><strong>カテゴリー指定</strong></label>
+                    <select class="form-control mr-2" id="category" name="category">
+                        <option value="{{null}}">指定なし</option>
+                        <option>マクロ経済学</option>
+                        <option>ミクロ経済学</option>
+                        <option>社会経済学</option>
+                        <option>統計学</option>
+                        <option>経済数学</option>
+                        <option>経営学</option>
+                        <option>会計学</option>
+                        <option>経済史</option>
+                        <option>経済史</option>
+                        <option>簿記</option>
+                        <option>金融</option>
+                        <option>その他</option>
+                    </select>
                     <div class="custom-control custom-checkbox text-light mr-2">
                         <input type="checkbox" name="search_name" value="1" class="custom-control-input"
                             id="custom-check-3">
-                        <label class="custom-control-label" for="custom-check-3">投稿者で検索</label>
+                        <label class="custom-control-label" for="custom-check-3"><strong>投稿者で検索</strong></label>
                     </div>
                     <input type="hidden" id="do_name_search" name="do_name_search" value="0">
                     <input id="keyword_input" class="form-control mr-sm-2" type="text" name="keyword"

@@ -5,6 +5,8 @@
 $url=parse_url(request()->fullUrl());
 parse_str($url['query'], $params);
 $params['post']=$post->id;
+$params['category']=$category;
+print_r($params);
 @endphp
 
 @section('content')
@@ -92,3 +94,16 @@ $params['post']=$post->id;
     </div>
 </div>
 @endsection
+
+<script>
+    window.onload = function(){
+        let category = document.getElementById('edit_category');
+if (category.dataset.category) {
+    for (let i = 0; i < category.options.length; i++) {
+        if (category.options.item(i).value === category.dataset.category) {
+            category.options.item(i).selected = true;
+        }
+    }
+}
+    };
+</script>
