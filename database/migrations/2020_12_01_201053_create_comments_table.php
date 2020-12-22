@@ -16,7 +16,7 @@ class CreateCommentsTable extends Migration
         Schema::create('comments', function (Blueprint $table) {
             $table->increments('id');
             // これは符号なしの整数値を条件として設定している。これをしないエラーになるらしい。
-            $table->unsignedInteger('post_id');
+            $table->unsignedBigInteger('post_id');
             $table->unsignedBigInteger('user_id')->nullable();
             $table->text('body');
             $table->timestamps();
