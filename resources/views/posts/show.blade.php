@@ -18,7 +18,7 @@ print_r($params);
             <div class="p-2 col-6">
                 <h1 class="h5 mb-4">{{ $post->title }}</h1>
                 <p class="mb-5">{{$post->body}}</p>
-                <p class="mb-5 badge">カテゴリー : {{$post->category ? $post->category:'無し'}}</p>
+                <p class="mb-2 badge">カテゴリー : {{$post->category ? $post->category:'無し'}}</p>
             </div>
             <div class="p-2 col-6">
                 <a href="{{asset('storage/' . $post->img)}}"><img src="{{asset('storage/' . $post->img)}}"
@@ -28,8 +28,30 @@ print_r($params);
         @else
         <h1 class="h5 mb-4">{{ $post->title }}</h1>
         <p class="mb-5">{{$post->body}}</p>
-        <p class="mb-5 badge">カテゴリー : {{$post->category ? $post->category:'無し'}}</p>
+        <p class="mb-2 badge">カテゴリー : {{$post->category ? $post->category:'無し'}}</p>
         @endif
+
+        <div class="fav mb-5">
+            @if($user && $like->like_exist($user->id,$post->id))
+            <span class="favorite-marke">
+                <a href="" class="js_like_toggle loved" data-user="{{$user}}" data-postid="{{ $post->id }}"><strong
+                        class="badge">イイね</strong><i class="fas fa-heart"></i></a>
+                <span class="likesCount">{{$post->likes_count}}</span>
+            </span>
+            @elseif($user && !$like->like_exist($user->id,$post->id))
+            <span class="favorite-marke">
+                <a href="" class="js_like_toggle" data-user="{{$user}}" data-postid="{{ $post->id }}"><strong
+                        class="badge">イイね</strong><i class="fas fa-heart"></i></a>
+                <span class="likesCount">{{$post->likes_count}}</span>
+            </span>
+            @else
+            <span class="favorite-marke">
+                <a href="" class="js_like_toggle" data-user="not_login" data-postid="{{ $post->id }}"><strong
+                        class="badge">イイね</strong><i class="fas fa-heart"></i></a>
+                <span class="likesCount">{{$post->likes_count}}</span>
+            </span>
+            @endif
+        </div>
 
         @auth
         @if ($post->user_id === $user->id)
@@ -77,7 +99,6 @@ print_r($params);
         <section>
             <h2 class="h5 mb-4">コメント</h2>
 
-            {{-- モデルでリレーションを設定しているからcommentsプロパティを使用できる。 --}}
             @forelse($post->comments as $comment)
             <div class="border-top p-4">
                 <time
@@ -112,7 +133,7 @@ print_r($params);
     </div>
 
     {{-- ここの条件分岐もいらないかもな --}}
-    @if (!empty($keyword))
+    @if (!empty($keyword || !empty('category')))
     <div class="mt-5">
         <a class="btn btn-secondary" href="{{ route('search',$params) }}">戻る</a>
     </div>

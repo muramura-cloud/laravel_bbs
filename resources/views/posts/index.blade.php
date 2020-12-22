@@ -30,12 +30,35 @@
                 </form>
             </div>
         </div>
-        <div class="card-footer">
-            <span class="mr-2">投稿日時 : {{$post->created_at ? $post->created_at->format('Y.m.d') : ''}}</span>
-            <span
-                class="badge badge-primary">{{$post->comments->count() ? 'コメント'.$post->comments->count().'件':''}}</span>
-            <span class="ml-2 badge badge-info">{{$post->category ? $post->category : ''}}</span>
-            <span class="ml-2 badge">{{$post->user ? ' 投稿者 : ' . $post->user->name : ''}}</span>
+        <div class="card-footer d-flex justify-content-between">
+            <div>
+                <span class="mr-2">投稿日時 : {{$post->created_at ? $post->created_at->format('Y.m.d') : ''}}</span>
+                <span
+                    class="badge badge-primary">{{$post->comments->count() ? 'コメント'.$post->comments->count().'件':''}}</span>
+                <span class="ml-2 badge badge-info">{{$post->category ? $post->category : ''}}</span>
+                <span class="ml-2 badge">{{$post->user ? ' 投稿者 : ' . $post->user->name : ''}}</span>
+            </div>
+            <div class="fav">
+                @if($user && $like->like_exist($user->id,$post->id))
+                <span class="favorite-marke">
+                    <a href="" class="js_like_toggle loved" data-user="{{$user}}" data-postid="{{ $post->id }}"><i
+                            class="fas fa-heart"></i></a>
+                    <span class="likesCount">{{$post->likes_count}}</span>
+                </span>
+                @elseif($user && !$like->like_exist($user->id,$post->id))
+                <span class="favorite-marke">
+                    <a href="" class="js_like_toggle" data-user="{{$user}}" data-postid="{{ $post->id }}"><i
+                            class="fas fa-heart"></i></a>
+                    <span class="likesCount">{{$post->likes_count}}</span>
+                </span>
+                @else
+                <span class="favorite-marke">
+                    <a href="" class="js_like_toggle" data-user="not_login" data-postid="{{ $post->id }}"><i
+                            class="fas fa-heart"></i></a>
+                    <span class="likesCount">{{$post->likes_count}}</span>
+                </span>
+                @endif
+            </div>
         </div>
     </div>
     @endforeach

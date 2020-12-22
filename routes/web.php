@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 // トップページ
 Route::get('/', 'App\Http\Controllers\PostsController@index')->name('top');
 Route::get('/search', 'App\Http\Controllers\PostsController@search')->name('search');
+Route::post('/ajaxlike', 'App\Http\Controllers\PostsController@ajaxlike');
 
 // 投稿
 Route::resource('posts', 'App\Http\Controllers\PostsController', ['only' => ['create', 'store', 'show', 'edit', 'update', 'destroy']]);

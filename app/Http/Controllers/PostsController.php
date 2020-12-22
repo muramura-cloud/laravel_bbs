@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\User;
+use App\Models\Like;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\PostRequest;
 use Illuminate\Support\Facades\Storage;
@@ -21,10 +22,16 @@ class PostsController extends Controller
         }
 
         // withでn+1問題を解決
-        // paginate()での返り値はLengthAwarePaginatorオブジェクトらしい。
-        $posts = Post::with(['comments'])->orderBy('created_at', 'desc')->paginate(10);
+        $posts = Post::with(['comments'])->withCount('likes')->orderBy('created_at', 'desc')->paginate(10);
 
-        return view('posts.index', ['posts' => $posts, 'user' => $user, 'page' => $posts->currentPage()]);
+        $params = [
+            'posts' => $posts,
+            'user' => $user,
+            'page' => $posts->currentPage(),
+            'like' => new Like,
+        ];
+
+        return view('posts.index', $params);
     }
 
     public function create(Request $request)
@@ -64,7 +71,7 @@ class PostsController extends Controller
             $user = Auth::user();
         }
 
-        $post = Post::findOrFail($post_id);
+        $post = Post::withCount('likes')->findOrFail($post_id);
 
         $params = [
             'post' => $post,
@@ -72,7 +79,8 @@ class PostsController extends Controller
             'user' => $user,
             'keyword' => $request->keyword,
             'category' => $request->category,
-            'do_name_search' => $request->do_name_search
+            'do_name_search' => $request->do_name_search,
+            'like' => new Like,
         ];
 
         return view('posts.show', $params);
@@ -174,19 +182,23 @@ class PostsController extends Controller
 
         $keyword = preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['keyword']);
 
+        // 空検索の場合
+        $posts = [];
+
+        // これってコメントとかwithで取得しないの？
         if (!empty($request['category'])) {
             if (!empty($keyword)) {
                 if ($request->do_name_search === '1') {
                     $users = $user_query->where('name', 'LIKE', "%{$keyword}%")->get();
 
-                    $posts = Post::where('category', $request['category'])
+                    $posts = Post::withCount('likes')->where('category', $request['category'])
                         ->where(function ($query) use ($users) {
                             foreach ($users as $user) {
                                 $query->orWhere('user_id', $user->id);
                             }
                         })->orderBy('created_at', 'desc')->paginate(10);
                 } else {
-                    $posts = Post::where('category', $request['category'])
+                    $posts = Post::withCount('likes')->where('category', $request['category'])
                         ->where(function ($query) use ($keyword) {
                             $query
                                 ->where('title', 'LIKE', "%{$keyword}%")
@@ -194,19 +206,19 @@ class PostsController extends Controller
                         })->orderBy('created_at', 'desc')->paginate(10);
                 }
             } else {
-                $posts = $post_query->where('category', $request['category'])->orderBy('created_at', 'desc')->paginate(10);
+                $posts = $post_query->withCount('likes')->where('category', $request['category'])->orderBy('created_at', 'desc')->paginate(10);
             }
         } elseif (!empty($keyword)) {
             if ($request->do_name_search === '1') {
-                $users = $user_query->where('name', 'LIKE', "%{$keyword}%")->get();
+                $users = $user_query->withCount('likes')->where('name', 'LIKE', "%{$keyword}%")->get();
 
-                $posts = Post::where(function ($query) use ($users) {
+                $posts = Post::withCount('likes')->where(function ($query) use ($users) {
                     foreach ($users as $user) {
                         $query->orWhere('user_id', $user->id);
                     }
                 })->orderBy('created_at', 'desc')->paginate(10);
             } else {
-                $posts = $post_query->where('title', 'LIKE', "%{$keyword}%")
+                $posts = $post_query->withCount('likes')->where('title', 'LIKE', "%{$keyword}%")
                     ->orWhere('body', 'LIKE', "%{$keyword}%")->orderBy('created_at', 'desc')->paginate(10);
             }
         }
@@ -221,5 +233,24 @@ class PostsController extends Controller
         ];
 
         return view('posts.find', $params);
+    }
+
+    public function ajaxlike(Request $request)
+    {
+        $user_id = Auth::user()->id;
+        $like = new Like;
+        $post = Post::findOrFail($request->post_id);
+
+        if ($like->like_exist($user_id, $post->id)) {
+            $like = Like::where('user_id', $user_id)->where('post_id', $post->id)->delete();
+        } else {
+            $like->user_id = $user_id;
+            $like->post_id = $post->id;
+            $like->save();
+        }
+
+        $post_likes_count = $post->loadCount('likes')->likes_count;
+
+        return response()->json(['postLikesCount' => $post_likes_count]);
     }
 }
