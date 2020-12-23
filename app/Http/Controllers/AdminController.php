@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\Comment;
+use App\Models\Report;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
@@ -129,11 +130,18 @@ class AdminController extends Controller
         return response()->json($posts);
     }
 
-    public function comment_search(Request $request)
+    public function commentSearch(Request $request)
     {
         $comments = $this->getSearchedComments($request);
 
         return response()->json($comments);
+    }
+
+    public function showReportedPosts(Request $request)
+    {
+        // $reported_posts=
+
+        //         return response()->json();
     }
 
     // これ多分引数でキーワードを受け取ったほうが汎用的になる。

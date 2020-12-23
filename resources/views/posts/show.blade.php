@@ -6,6 +6,7 @@ $url=parse_url(request()->fullUrl());
 parse_str($url['query'], $params);
 $params['post'] = $post->id;
 $params['category'] = $category;
+$params['target'] = 'posts';
 print_r($params);
 @endphp
 
@@ -54,9 +55,10 @@ print_r($params);
             @endif
         </div>
 
-        @auth
-        @if ($post->user_id === $user->id)
         <div class="mb-4 text-left">
+            <a class="btn btn-secondary" href="{{ route('report_create',$params) }}">投稿報告</a>
+            @auth
+            @if ($post->user_id === $user->id)
             <a class="btn btn-primary" href="{{ route('posts.edit', $params) }}">編集</a>
             <form style="display: inline-block;" method="POST"
                 action="{{ route('posts.destroy', ['post' => $post->id]) }}">
@@ -69,9 +71,9 @@ print_r($params);
 
                 <button class="btn btn-danger">削除</button>
             </form>
+            @endif
+            @endauth
         </div>
-        @endif
-        @endauth
 
         <form action="{{ route('comments.store') }}" method="post">
             @csrf

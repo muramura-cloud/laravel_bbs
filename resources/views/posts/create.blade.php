@@ -26,11 +26,6 @@
                     <label for="body"><strong>本文</strong>(必須)</label>
                     <textarea id="body" name="body" class="form-control {{ $errors->has('body') ? 'is-invalid' : '' }}"
                         rows="4">{{ old('body') }}</textarea>
-                    @if ($errors->has('body'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('body') }}
-                    </div>
-                    @endif
                 </div>
 
                 <div class="form-group">

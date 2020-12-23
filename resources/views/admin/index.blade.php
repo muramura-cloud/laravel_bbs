@@ -6,6 +6,7 @@
     <div class="d-flex">
         <button type="button" class="btn btn-outline-success mr-2" data-toggle="modal"
             data-target="#exampleModalCenter">投稿を検索する</button>
+        <button id="reported_posts_btn" type="button" class="btn btn-outline-warning mr-2">報告された投稿</button>
         <a href="{{route('admin_comment_list')}}" class="btn btn-outline-info">コメント一覧へ</a>
     </div>
     <br>
