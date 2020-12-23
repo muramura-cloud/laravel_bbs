@@ -36,7 +36,7 @@ $(function () {
             },
             dataType: 'json',
         }).done(function (data) {
-            $this.toggleClass('loved');
+            $this.children('i').toggleClass('loved');
             $this.next('.likesCount').html(data.postLikesCount);
         }).fail(function (jqXHR, textStatus, errorThrown) {
             console.log("ajax通信に失敗しました");

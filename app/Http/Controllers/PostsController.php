@@ -229,6 +229,7 @@ class PostsController extends Controller
             'page' => (int) $request->page,
             'keyword' => $keyword,
             'category' => $request['category'],
+            'like' => new Like,
             'do_name_search' => $request->do_name_search,
         ];
 
