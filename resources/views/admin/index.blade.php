@@ -28,12 +28,12 @@
                         <fieldset class="mb-4">
                             <div class="form-group mb-4 d-flex justify-content-between">
                                 <label for="keyword_title"><strong>タイトル</strong></label>
-                                <input id="keyword_title" class="form-control mr-sm-2" type="text" name="keyword_title"
+                                <input id="keyword_title" class="form-control ml-3" type="text" name="keyword_title"
                                     placeholder="タイトル" aria-label="Search">
                             </div>
                             <div class="form-group mb-4 d-flex justify-content-between">
                                 <label for="keyword_body"><strong>本文</strong></label>
-                                <input id="keyword_body" class="form-control mr-sm-2" type="text" name="keyword_body"
+                                <input id="keyword_body" class="form-control ml-3" type="text" name="keyword_body"
                                     placeholder="本文" aria-label="Search">
                             </div>
                         </fieldset>
@@ -47,18 +47,18 @@
         </div>
     </div>
 
-    <table id="posts_table" class="table table-bordered">
+    <table id="posts_table" class="table table-bordered post-table">
         <thead class="thead-dark">
             <tr>
-                <th scope="col"><input class="btn btn-danger" type="button" style="width: 80px;" id="all_check_btn"
-                        value="全選択"></th>
-                <th scope="col">ID</th>
+                <th scope="col" style="width: 50px;"><input class="btn btn-danger" type="button" style="width: 80px;"
+                        id="all_check_btn" value="全選択"></th>
+                <th scope="col" style="width: 30px;">ID</th>
                 <th scope="col">タイトル</th>
                 <th scope="col">本文</th>
                 <th scope="col">画像</th>
                 <th scope="col">コメント</th>
                 <th scope="col">日付</th>
-                <th scope="col"></th>
+                <th scope="col" style="width: 80px;"></th>
             </tr>
         </thead>
         <tbody id="posts_tbody">
@@ -67,7 +67,7 @@
                 <th scope="row"><input type="checkbox" name="delete_checkbox" value="{{$post->id}}"></th>
                 <td>{{$post->id}}</td>
                 <td>{{$post->title}}</td>
-                <td>{{$post->body}}</td>
+                <td class="td-body" tabindex="0">{{$post->body}}</td>
                 <td>
                     @if (!empty($post->img))
                     <a href="{{asset('storage/' . $post->img)}}"><img src="{{asset('storage/' . $post->img)}}"

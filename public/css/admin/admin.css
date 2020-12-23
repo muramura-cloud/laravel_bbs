@@ -1,0 +1,11 @@
+.post-table .td-body {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+.post-table .td-body:focus {
+  white-space: normal;
+}
+/*# sourceMappingURL=admin.css.map */

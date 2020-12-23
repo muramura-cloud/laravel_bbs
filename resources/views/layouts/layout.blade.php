@@ -9,12 +9,12 @@
             integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
         <link href="{{asset('css/post/like.css')}}" rel="stylesheet">
+        <link href="{{asset('css/post/post.css')}}" rel="stylesheet">
     </head>
 
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <a class="navbar-brand" href="{{ url('') }}">Laravel BBS</a>
-            {{-- jsが必要 --}}
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -29,13 +29,13 @@
                         <a class="nav-link disabled" href="{{route('dashboard')}}">マイページ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link disabled" href="{{route('admin_top')}}">管理者はこちら</a>
+                        <a class="nav-link disabled" href="{{route('admin_top')}}">管理者</a>
                     </li>
                 </ul>
                 <form class="form-inline my-2 my-lg-0" method="get" action="{{route('search')}}">
                     @csrf
 
-                    <label for="category" class="mr-2 text-white"><strong>カテゴリー指定</strong></label>
+                    <label for="category" class="mr-2 text-white"><strong>カテゴリー</strong></label>
                     <select class="form-control mr-2" id="category" name="category">
                         <option value="{{null}}">指定なし</option>
                         <option>マクロ経済学</option>
@@ -69,7 +69,7 @@
                     </a>
                     @else
                     <a href="{{route('login')}}">
-                        <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">ログイン</button>
+                        <button class="btn btn-outline-primary my-2 my-sm-0 mr-1" type="submit">ログイン</button>
                     </a>
                     <a href="{{route('register')}}">
                         <button class="btn btn-outline-warning my-2 my-sm-0" type="submit">新規登録</button>

@@ -1,0 +1,7 @@
+.post-body {
+  max-height: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/*# sourceMappingURL=post.css.map */

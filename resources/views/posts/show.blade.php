@@ -13,11 +13,12 @@ print_r($params);
 @section('content')
 <div class="container mt-4">
     <div class="border p-4">
+        {{-- ここら辺もっと簡単にまとめられない？ --}}
         @if (!empty($post->img))
         <div class="d-flex">
             <div class="p-2 col-6">
-                <h1 class="h5 mb-4">{{ $post->title }}</h1>
-                <p class="mb-5">{{$post->body}}</p>
+                <h1 class="h5 mb-4"><strong>{{ $post->title }}</strong></h1>
+                <p class="mb-5">{!! nl2br(e($post->body)) !!}</p>
                 <p class="mb-2 badge">カテゴリー : {{$post->category ? $post->category:'無し'}}</p>
             </div>
             <div class="p-2 col-6">
@@ -26,8 +27,8 @@ print_r($params);
             </div>
         </div>
         @else
-        <h1 class="h5 mb-4">{{ $post->title }}</h1>
-        <p class="mb-5">{{$post->body}}</p>
+        <h1 class="h5 mb-4"><strong>{{ $post->title }}</strong></h1>
+        <p class="mb-5">{!! nl2br(e($post->body)) !!}</p>
         <p class="mb-2 badge">カテゴリー : {{$post->category ? $post->category:'無し'}}</p>
         @endif
 
@@ -97,7 +98,7 @@ print_r($params);
         <br>
 
         <section>
-            <h2 class="h5 mb-4">コメント</h2>
+            <h2 class="h5 mb-4"><strong>コメント</strong></h2>
 
             @forelse($post->comments as $comment)
             <div class="border-top p-4">
@@ -132,8 +133,7 @@ print_r($params);
         </section>
     </div>
 
-    {{-- ここの条件分岐もいらないかもな --}}
-    @if (!empty($keyword || !empty('category')))
+    @if (!empty($keyword || !empty($params['category'])))
     <div class="mt-5">
         <a class="btn btn-secondary" href="{{ route('search',$params) }}">戻る</a>
     </div>

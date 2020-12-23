@@ -81,7 +81,7 @@ function getPostHtml(value, paginate_data) {
         <th scope="row"><input type="checkbox" name="delete_checkbox" value="${value.id}"></th>
         <td>${value.id}</td>
         <td>${value.title}</td>
-        <td>${value.body}</td>
+        <td class="td-body" tabindex="0">${value.body}</td>
         <td>${a_img}</td>
         <td>${a_comment}</td>
         <td>${new Date(value.created_at).toLocaleString()}</td>

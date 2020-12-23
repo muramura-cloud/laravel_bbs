@@ -14,7 +14,7 @@ $(function () {
 
         let $this = $(this);
 
-        // ログインしてなかったら。
+        // ログインしていないなら
         if ($this.data('user') === 'not_login') {
             swal(options).then(function (value) {
                 if (value) {
@@ -26,14 +26,10 @@ $(function () {
         }
 
         $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
+            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
             type: 'POST',
             url: '/ajaxlike',
-            data: {
-                'post_id': $this.data('postid')
-            },
+            data: {'post_id': $this.data('postid')},
             dataType: 'json',
         }).done(function (data) {
             $this.children('i').toggleClass('loved');
