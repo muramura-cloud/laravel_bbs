@@ -23,7 +23,7 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
 Route::get('/admin', 'App\Http\Controllers\AdminController@index')->name('admin_top');
 Route::get('/admin/search/', 'App\Http\Controllers\AdminController@search');
 Route::get('/admin/comment_search/', 'App\Http\Controllers\AdminController@commentSearch');
-Route::get('/admin/reported_post', 'App\Http\Controllers\AdminController@showComments');
+Route::get('/admin/reported/', 'App\Http\Controllers\AdminController@showReported');
 Route::get('/admin_comment/{post_id?}', 'App\Http\Controllers\AdminController@showComments');
 Route::get('/admin_comment_list', 'App\Http\Controllers\AdminController@comment')->name('admin_comment_list');
 

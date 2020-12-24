@@ -21,7 +21,7 @@ class ReportController extends Controller
         }
 
         $params = [
-            'id' => $request->post,
+            'id' => $request->target === 'posts' ? $request->post : $request->comment_id,
             'target' => $request->target,
             'report_categories' => ReportCategory::get(),
             'user' => $user,

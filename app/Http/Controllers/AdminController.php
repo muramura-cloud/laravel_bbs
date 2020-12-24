@@ -8,6 +8,7 @@ use App\Models\Comment;
 use App\Models\Report;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\Helper;
 
 class AdminController extends Controller
 {
@@ -137,11 +138,22 @@ class AdminController extends Controller
         return response()->json($comments);
     }
 
-    public function showReportedPosts(Request $request)
+    public function showReported(Request $request)
     {
-        // $reported_posts=
+        $ids = array_column(Report::where('table_name', $request->table_name)->get('target_id')->toArray(), 'target_id');
 
-        //         return response()->json();
+        $model = new Post;
+        if ($request->table_name === 'comments') {
+            $model = new Comment;
+        }
+
+        $contents = $model::where(function ($post_query) use ($ids) {
+            foreach ($ids as $id) {
+                $post_query->orWhere('id', $id);
+            }
+        })->orderBy('created_at', 'desc')->paginate($this->per_page, ['*'], 'page', (int) $request['page']);
+
+        return response()->json($contents);
     }
 
     // これ多分引数でキーワードを受け取ったほうが汎用的になる。

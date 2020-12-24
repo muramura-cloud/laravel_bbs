@@ -13,5 +13,9 @@ return [
             'model' => 'App\Models\Post',
             'url' => 'post/{id}'
         ],
+        'comments' => [
+            'model' => 'App\Models\Comment',
+            'url' => 'comment/{id}'
+        ],
     ],
 ];

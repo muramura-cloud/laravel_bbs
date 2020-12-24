@@ -8,3 +8,8 @@ document.getElementsByName('search_name')[0].addEventListener('click', function 
         document.getElementById('do_name_search').value = 0;
     }
 }, false);
+
+// コメント報告ボタンのgetパラメーターの調整
+let link = $('#comment_report_btn').attr('href');
+let comment_id = $('#comment_report_btn').attr('value');
+$('#comment_report_btn').attr('href', link.replace('target=posts', 'target=comments').concat(`&comment_id=${comment_id}`));

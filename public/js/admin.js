@@ -346,15 +346,17 @@ $('#reported_posts_btn').on('click', function () {
     $('#pagination_btns').empty();
 
     $.ajax({
-        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
         type: 'GET',
-        url: '/admin/reported_post',
-        data: {'_token': $('meta[name="csrf-token"]').attr('content'),},
+        url: '/admin/reported/',
+        data: {
+            '_token': $('meta[name="csrf-token"]').attr('content'),
+            'table_name': 'posts',
+        },
         dataType: 'json',
     }).done(function (data) {
         let html;
 
-        // dataにはページネーションオブジェクトが入るので、さらにそこに存在するdataプロパティをまわす
         $.each(data.data, function (index, value) {
             html += getPostHtml(value, data);
         });
@@ -417,3 +419,42 @@ $('#comment_search_btn').on('click', function () {
         console.log("errorThrown    : " + errorThrown.message); // 例外情報
     });
 });
+
+// 報告されたコメント表示ボタン
+$('#reported_comments_btn').on('click', function () {
+    $('#posts_tbody').empty();
+    $('#pagination_btns').empty();
+
+    $.ajax({
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+        type: 'GET',
+        url: '/admin/reported/',
+        data: {
+            '_token': $('meta[name="csrf-token"]').attr('content'),
+            'table_name': 'comments',
+        },
+        dataType: 'json',
+    }).done(function (data) {
+        let html;
+
+        $.each(data.data, function (index, value) {
+            html += getCommentHtml(value);
+        });
+
+        $('#posts_tbody').append(html);
+        $('#pagination_btns').append(getPaginationBtns(data));
+
+        setUpSingleDeleteBtn(options);
+        setUpMultDeleteBtn(options);
+        setUpPaginationBtns(options);
+
+        if (data.data.length === 0) {
+            $('#posts_table').after('<p class="text-center mt-5 search-null">投稿が見つかりません</p>');
+        }
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        console.log("ajax通信に失敗しました");
+        console.log("jqXHR          : " + jqXHR.status); // HTTPステータスが取得
+        console.log("textStatus     : " + textStatus);    // タイムアウト、パースエラー
+        console.log("errorThrown    : " + errorThrown.message); // 例外情報
+    });
+})

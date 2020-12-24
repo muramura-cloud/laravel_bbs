@@ -1,6 +1,7 @@
 @extends('layouts.layout')
 
 {{-- 本当はヘルパークラス（Helpers/Helper.php）をパラメーター生成で使いたいけど、なぜか、独自ヘルパークラスがうまく読み込めなくて、仕方なくここでパラメーターの配列を作る。 --}}
+{{-- あるいはjsでうまくパラメータをカスタマイズする方法もある。 --}}
 @php
 $url=parse_url(request()->fullUrl());
 parse_str($url['query'], $params);
@@ -56,7 +57,7 @@ print_r($params);
         </div>
 
         <div class="mb-4 text-left">
-            <a class="btn btn-secondary" href="{{ route('report_create',$params) }}">投稿報告</a>
+            <a class="btn btn-outline-dark" href="{{ route('report_create',$params) }}">報告</a>
             @auth
             @if ($post->user_id === $user->id)
             <a class="btn btn-primary" href="{{ route('posts.edit', $params) }}">編集</a>
@@ -104,10 +105,16 @@ print_r($params);
 
             @forelse($post->comments as $comment)
             <div class="border-top p-4">
-                <time
-                    class="text-secondary">{{ $comment->created_at ? $comment->created_at->format('Y.m.d H:i') : '' }}</time>
-                <span class="badge">{{$comment->user ? $comment->user->name : ''}}</span>
-                <p class="mt-2">{{$comment->body}}</p>
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <time
+                            class="text-secondary">{{ $comment->created_at ? $comment->created_at->format('Y.m.d H:i') : '' }}</time>
+                        <span class="badge">{{$comment->user ? $comment->user->name : ''}}</span>
+                        <p class="mt-2">{{$comment->body}}</p>
+                    </div>
+                    <a id="comment_report_btn" style="height: 30px;" class="btn btn-outline-dark text-right"
+                        href="{{ route('report_create',$params) }}" value="{{$comment->id}}"><small>報告</small></a>
+                </div>
                 @auth
                 @if ($comment->user_id === $user->id)
                 <div class="mb-4 text-right">

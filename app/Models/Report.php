@@ -15,9 +15,4 @@ class Report extends Model
         'table_name',
         'comment',
     ];
-
-    public function post()
-    {
-        return $this->belongsTo('App\Models\User');
-    }
 }

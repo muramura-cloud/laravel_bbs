@@ -11,6 +11,7 @@
                 aria-label="Search">
             <button id="comment_search_btn" class="btn btn-outline-success my-2 my-sm-0 mr-3" type="button">検索</button>
         </form>
+        <button id="reported_comments_btn" type="button" class="btn btn-outline-warning mr-2">報告されたコメント</button>
     </div>
     <br>
 

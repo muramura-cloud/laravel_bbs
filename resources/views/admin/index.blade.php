@@ -109,7 +109,6 @@
     </div>
 </div>
 
-{{-- $posts->links()はpagination/tailwind.blade.phpを表示している。 --}}
 <div id="pagination_btns" class="d-flex justify-content-center mb-5">
     {{ $posts->links() }}
 </div>
