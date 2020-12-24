@@ -7,6 +7,10 @@ Route::get('/', 'App\Http\Controllers\PostsController@index')->name('top');
 Route::get('/search', 'App\Http\Controllers\PostsController@search')->name('search');
 Route::post('/ajaxlike', 'App\Http\Controllers\PostsController@ajaxlike');
 
+// ユーザーページ
+Route::get('/user', 'App\Http\Controllers\UsersController@index')->name('user_top');
+
+
 // 投稿
 Route::resource('posts', 'App\Http\Controllers\PostsController', ['only' => ['create', 'store', 'show', 'edit', 'update', 'destroy']]);
 

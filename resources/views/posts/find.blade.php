@@ -20,7 +20,7 @@ parse_str($url['query'], $params);
         @endif
         <div class="card-body">
             <h4 class="card-title">{{$post->title}}</h4>
-            <p class="card-text">{{$post->body}}</p>
+            <p class="card-text post-body">{{$post->body}}</p>
             <div class="mb-1">
                 <form style="display: inline-block;" method="get"
                     action="{{ route('posts.show', ['post' => $post->id]) }}">
