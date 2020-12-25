@@ -32,7 +32,7 @@ class UsersController extends Controller
                 foreach ($loved_post_ids as $id) {
                     $post_query->orWhere('id', $id);
                 }
-            })->with(['comments'])->withCount('likes')->orderBy('created_at', 'desc')->paginate($this->per_page);
+            })->with(['comments'])->withCount('likes')->orderBy('created_at', 'desc')->paginate($this->per_page, ['*'], 'page', 1);
         }
 
         $comments = Comment::where('user_id', $auth->id)->paginate($this->per_page);

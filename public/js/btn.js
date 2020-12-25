@@ -10,6 +10,9 @@ document.getElementsByName('search_name')[0].addEventListener('click', function 
 }, false);
 
 // コメント報告ボタンのgetパラメーターの調整
-let link = $('#comment_report_btn').attr('href');
-let comment_id = $('#comment_report_btn').attr('value');
-$('#comment_report_btn').attr('href', link.replace('target=posts', 'target=comments').concat(`&comment_id=${comment_id}`));
+let comment_report_btns = document.getElementsByName('comment_report_btn');
+for (let i = 0; i < comment_report_btns.length; i++) {
+    let link = comment_report_btns[i].href;
+    let comment_id = comment_report_btns[i].getAttribute('value');
+    comment_report_btns[i].setAttribute('href', link.replace('target=posts', 'target=comments').concat(`&comment_id=${comment_id}`));
+}

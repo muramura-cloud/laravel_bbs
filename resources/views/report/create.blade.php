@@ -9,6 +9,12 @@
 
         <input type="hidden" name="id" value="{{$id}}">
         <input type="hidden" name="target" value="{{$target}}">
+        <input type="hidden" name="post_id" value="{{$post_id}}">
+        <input type="hidden" name="page" value="{{$page}}">
+        <input type="hidden" name="keyword" value="{{$keyword}}">
+        <input type="hidden" name="category" value="{{$category}}">
+        <input type="hidden" name="do_name_search" value="{{$do_name_search}}">
+        <input type="hidden" name="from" value="{{$from}}">
         <fieldset class="mb-4">
             <div class="form-group">
                 <label for="report_category"><strong>カテゴリー</strong></label>
@@ -24,20 +30,9 @@
 
             <div class="form-group">
                 <label><strong>メッセージ</strong></label>
-                <textarea class="form-control {{ $errors->has('body') ? 'is-invalid' : '' }}" name="comment">
-                    @if ($errors->has('comment'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('comment') }}
-                    </div>
-                    @endif
+                <textarea class="form-control {{ $errors->has('comment') ? 'is-invalid' : '' }}" name="comment">
                 </textarea>
             </div>
-
-            <pre>
-                @php
-                print_r($errors);
-                @endphp    
-            </pre>
 
             <div class="form_group text-right">
                 <button id="report_btn" type="submit" class="btn btn-danger">報告する</button>

@@ -81,6 +81,7 @@ class PostsController extends Controller
             'category' => $request->category,
             'do_name_search' => $request->do_name_search,
             'like' => new Like,
+            'from' => $request->from
         ];
 
         return view('posts.show', $params);
@@ -101,7 +102,8 @@ class PostsController extends Controller
             'user' => $user,
             'keyword' => $request->keyword,
             'category' => $request->category,
-            'do_name_search' => $request->do_name_search
+            'do_name_search' => $request->do_name_search,
+            'from' => $request->from
         ];
 
         return view('posts.edit', $params);
@@ -109,6 +111,7 @@ class PostsController extends Controller
 
     public function update($post_id, PostRequest $request)
     {
+        // 更新するデータ
         $params = [
             'title' => $request->title,
             'body' => $request->body,
@@ -132,12 +135,14 @@ class PostsController extends Controller
 
         $post->fill($params)->save();
 
+        // ルーティングデータ
         $params = [
             'post' => $post,
             'page' => $request->page,
             'keyword' => $request->keyword,
             'category' => $request->category,
-            'do_name_search' => $request->do_name_search
+            'do_name_search' => $request->do_name_search,
+            'from' => $request->from
         ];
 
         return redirect()->route('posts.show', $params);
@@ -160,10 +165,16 @@ class PostsController extends Controller
             'page' => $request->page,
             'keyword' => $request->keyword,
             'category' => $request->category,
-            'do_name_search' => $request->do_name_search
+            'do_name_search' => $request->do_name_search,
+            'from' => $request->from
         ];
 
-        if (!empty($request->keyword)) {
+        if (strpos($request->from, 'user') !== false) {
+            return redirect()->route('user_top', $params);
+        }
+
+        // キーワードが送られてきたり、カテゴリーが送られてきたら再度検索して表示する。
+        if (!empty($request->keyword) || !empty($request->category)) {
             return redirect()->route('search', $params);
         }
 

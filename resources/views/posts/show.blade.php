@@ -8,6 +8,7 @@ parse_str($url['query'], $params);
 $params['post'] = $post->id;
 $params['category'] = $category;
 $params['target'] = 'posts';
+$params['from'] = $from;
 print_r($params);
 @endphp
 
@@ -67,6 +68,7 @@ print_r($params);
                 <input type="hidden" name="keyword" value="{{$keyword}}">
                 <input type="hidden" name="category" value="{{$category}}">
                 <input type="hidden" name="do_name_search" value="{{$do_name_search}}">
+                <input type="hidden" name="from" value="{{$from}}">
                 @csrf
                 @method('DELETE')
 
@@ -84,6 +86,7 @@ print_r($params);
             <input type="hidden" name="keyword" value="{{$keyword}}">
             <input type="hidden" name="category" value="{{$category}}">
             <input type="hidden" name="do_name_search" value="{{$do_name_search}}">
+            <input type="hidden" name="from" value="{{$from}}">
             <div class="form-group">
                 <label for="body"><strong>本文(必須)</strong></label>
                 <textarea name="body" class="form-control {{$errors->has('body') ? 'is-invalid' : ''}}" rows="4">{{old('body')}}
@@ -105,52 +108,49 @@ print_r($params);
 
             @forelse($post->comments as $comment)
             <div class="border-top p-4">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <time
-                            class="text-secondary">{{ $comment->created_at ? $comment->created_at->format('Y.m.d H:i') : '' }}</time>
-                        <span class="badge">{{$comment->user ? $comment->user->name : ''}}</span>
-                        <p class="mt-2">{{$comment->body}}</p>
-                    </div>
-                    <a id="comment_report_btn" style="height: 30px;" class="btn btn-outline-dark text-right"
-                        href="{{ route('report_create',$params) }}" value="{{$comment->id}}"><small>報告</small></a>
-                </div>
-                @auth
-                @if ($comment->user_id === $user->id)
+                <time
+                    class="text-secondary">{{ $comment->created_at ? $comment->created_at->format('Y.m.d H:i') : '' }}</time>
+                <span class="badge">{{$comment->user ? $comment->user->name : ''}}</span>
+                <p class="mt-2">{{$comment->body}}</p>
                 <div class="mb-4 text-right">
+                    <a name="comment_report_btn" class="btn btn-outline-dark p-1"
+                        href="{{ route('report_create',$params) }}" value="{{$comment->id}}"><small>報告</small></a>
+                    @auth
+                    @if ($comment->user_id === $user->id)
                     {{-- もうちょっとここら辺スッキリさせたいな。 --}}
                     <a class="btn btn-primary p-1"
-                        href="{{ route('comments.edit', ['comment' => $comment->id,'page'=>$page,'keyword'=>$keyword,'category'=>$category ,'do_name_search'=>$do_name_search]) }}"><small>編集</small></a>
+                        href="{{ route('comments.edit', ['comment' => $comment->id,'page'=>$page,'keyword'=>$keyword,'category'=>$category ,'do_name_search'=>$do_name_search,'from'=>$from]) }}">
+                        <small>編集</small></a>
                     <form style="display: inline-block;" method="POST"
                         action="{{ route('comments.destroy', ['comment' => $comment->id]) }}">
                         <input type="hidden" name="page" value="{{$page}}">
                         <input type="hidden" name="keyword" value="{{$keyword}}">
                         <input type="hidden" name="category" value="{{$category}}">
                         <input type="hidden" name="do_name_search" value="{{$do_name_search}}">
+                        <input type="hidden" name="from" value="{{$from}}">
                         @csrf
                         @method('DELETE')
 
                         <button class="btn btn-danger p-1"><small>削除</small></button>
                     </form>
+                    @endif
+                    @endauth
                 </div>
-                @endif
-                @endauth
             </div>
             @empty
             <p>コメントはまだありません。</p>
             @endforelse
         </section>
     </div>
-
-    @if (!empty($keyword || !empty($params['category'])))
     <div class="mt-5">
+        @if (strpos($from,'user') !== false)
+        <a class="btn btn-secondary" href="{{ route('user_top',$params) }}">戻る</a>
+        @elseif(!empty($keyword || !empty($params['category'])))
         <a class="btn btn-secondary" href="{{ route('search',$params) }}">戻る</a>
-    </div>
-    @else
-    <div class="mt-5">
+        @else
         <a class="btn btn-secondary" href="{{ route('top',['page'=>$page]) }}">戻る</a>
+        @endif
     </div>
-    @endif
     <br>
 </div>
 @endsection

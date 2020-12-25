@@ -52,6 +52,7 @@
                             @csrf
 
                             <input type="hidden" name="page" value="{{$posts->currentPage()}}">
+                            <input type="hidden" name="from" value="user_my_posts">
                             <button class="btn btn-success">続きを読む</button>
                         </form>
                     </div>
@@ -89,6 +90,9 @@
             @empty
             <p>投稿はまだありません。</p>
             @endforelse
+            <div class="d-flex justify-content-center mb-5">
+                {{ $posts->links() }}
+            </div>
         </div>
         <div id="my_loved_posts" class="tab-pane">
             @forelse ($loved_posts as $post)
@@ -107,7 +111,8 @@
                             action="{{ route('posts.show', ['post' => $post->id]) }}">
                             @csrf
 
-                            <input type="hidden" name="page" value="{{$posts->currentPage()}}">
+                            <input type="hidden" name="page" value="{{$loved_posts->currentPage()}}">
+                            <input type="hidden" name="from" value="user_my_loved_posts">
                             <button class="btn btn-success">続きを読む</button>
                         </form>
                     </div>
@@ -147,6 +152,9 @@
             <br>
             <p>イイねした投稿はありません。</p>
             @endforelse
+            <div class="d-flex justify-content-center mb-5">
+                {{ $loved_posts->links() }}
+            </div>
         </div>
         <div id="my_comments" class="tab-pane">
             @forelse($comments as $comment)
@@ -160,8 +168,38 @@
             @empty
             <p>コメントはまだありません。</p>
             @endforelse
+            <div class="d-flex justify-content-center mb-5">
+                {{ $comments->links() }}
+            </div>
         </div>
     </div>
 </div>
 
 @endsection
+
+<script>
+    window.onload = function(){
+        let queries=getUrlQueries();
+        if(!jQuery.isEmptyObject(queries)) {
+            let tab_id=queries.from;
+
+            let nav_links=document.getElementsByClassName('nav-link');
+            for(let i = 0; i < nav_links.length; i++) {
+                nav_links[i].classList.remove('active');
+                if(nav_links[i].getAttribute('href')===`#${tab_id.replace('user_','')}`) {
+                    console.log(tab_id);
+                    nav_links[i].classList.add('active');
+                }
+            }
+
+            let tab_panes=document.getElementsByClassName('tab-pane');
+            for(let i = 0; i < tab_panes.length; i++) {
+                tab_panes[i].classList.remove('active');
+                if(tab_panes[i].getAttribute('id')===tab_id.replace('user_','')) {
+                    console.log(tab_id);
+                    tab_panes[i].classList.add('active');
+                }
+            }
+        }
+    };
+</script>

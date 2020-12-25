@@ -10,7 +10,6 @@ Route::post('/ajaxlike', 'App\Http\Controllers\PostsController@ajaxlike');
 // ユーザーページ
 Route::get('/user', 'App\Http\Controllers\UsersController@index')->name('user_top');
 
-
 // 投稿
 Route::resource('posts', 'App\Http\Controllers\PostsController', ['only' => ['create', 'store', 'show', 'edit', 'update', 'destroy']]);
 
@@ -38,4 +37,5 @@ Route::post('/admin_mult_comment_delete', 'App\Http\Controllers\AdminController@
 
 //違反報告
 Route::get('/report/create', 'App\Http\Controllers\ReportController@create')->name('report_create');
+Route::get('/report/reported', 'App\Http\Controllers\ReportController@showReported')->name('report_reported');
 Route::post('/report', 'App\Http\Controllers\ReportController@store');

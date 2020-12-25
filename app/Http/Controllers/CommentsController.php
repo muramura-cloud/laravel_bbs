@@ -29,6 +29,7 @@ class CommentsController extends Controller
             'keyword' => $request->keyword,
             'category' => $request->category,
             'do_name_search' => $request->do_name_search,
+            'from' => $request->from,
         ];
 
         return redirect()->route('posts.show', $params);
@@ -51,6 +52,7 @@ class CommentsController extends Controller
             'keyword' => $request->keyword,
             'category' => $request->category,
             'do_name_search' => $request->do_name_search,
+            'from' => $request->from,
         ];
 
         return view('comments.edit', $params);
@@ -72,6 +74,7 @@ class CommentsController extends Controller
             'keyword' => $request->keyword,
             'category' => $request->category,
             'do_name_search' => $request->do_name_search,
+            'from' => $request->from,
         ];
 
         return redirect()->route('posts.show', $params);
@@ -89,6 +92,7 @@ class CommentsController extends Controller
             'keyword' => $request->keyword,
             'category' => $request->category,
             'do_name_search' => $request->do_name_search,
+            'from' => $request->from,
         ];
 
         return redirect()->route('posts.show', $params);
