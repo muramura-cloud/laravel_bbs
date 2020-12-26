@@ -202,14 +202,16 @@ class PostsController extends Controller
                 if ($request->do_name_search === '1') {
                     $users = $user_query->where('name', 'LIKE', "%{$keyword}%")->get();
 
-                    $posts = Post::withCount('likes')->where('category', $request['category'])
-                        ->where(function ($query) use ($users) {
-                            foreach ($users as $user) {
-                                $query->orWhere('user_id', $user->id);
-                            }
-                        })->orderBy('created_at', 'desc')->paginate(10);
+                    if ($users->count()) {
+                        $posts = Post::with(['comments'])->withCount('likes')->where('category', $request['category'])
+                            ->where(function ($query) use ($users) {
+                                foreach ($users as $user) {
+                                    $query->orWhere('user_id', $user->id);
+                                }
+                            })->orderBy('created_at', 'desc')->paginate(10);
+                    }
                 } else {
-                    $posts = Post::withCount('likes')->where('category', $request['category'])
+                    $posts = Post::with(['comments'])->withCount('likes')->where('category', $request['category'])
                         ->where(function ($query) use ($keyword) {
                             $query
                                 ->where('title', 'LIKE', "%{$keyword}%")
@@ -217,19 +219,21 @@ class PostsController extends Controller
                         })->orderBy('created_at', 'desc')->paginate(10);
                 }
             } else {
-                $posts = $post_query->withCount('likes')->where('category', $request['category'])->orderBy('created_at', 'desc')->paginate(10);
+                $posts = $post_query->with(['comments'])->withCount('likes')->where('category', $request['category'])->orderBy('created_at', 'desc')->paginate(10);
             }
         } elseif (!empty($keyword)) {
             if ($request->do_name_search === '1') {
-                $users = $user_query->withCount('likes')->where('name', 'LIKE', "%{$keyword}%")->get();
+                $users = $user_query->where('name', 'LIKE', "%{$keyword}%")->get();
 
-                $posts = Post::withCount('likes')->where(function ($query) use ($users) {
-                    foreach ($users as $user) {
-                        $query->orWhere('user_id', $user->id);
-                    }
-                })->orderBy('created_at', 'desc')->paginate(10);
+                if ($users->count()) {
+                    $posts = Post::with(['comments'])->withCount('likes')->where(function ($query) use ($users) {
+                        foreach ($users as $user) {
+                            $query->orWhere('user_id', $user->id);
+                        }
+                    })->orderBy('created_at', 'desc')->paginate(10);
+                }
             } else {
-                $posts = $post_query->withCount('likes')->where('title', 'LIKE', "%{$keyword}%")
+                $posts = $post_query->with(['comments'])->withCount('likes')->where('title', 'LIKE', "%{$keyword}%")
                     ->orWhere('body', 'LIKE', "%{$keyword}%")->orderBy('created_at', 'desc')->paginate(10);
             }
         }
