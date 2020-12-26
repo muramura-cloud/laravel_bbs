@@ -39,7 +39,6 @@ class AdminController extends Controller
         }
 
         $post = Post::with(['comments'])->findOrFail((int) $post_id);
-        // なんとかこれでうまくいった。なんかページネーターオブジェクト見てみたら、現在ページがなぜか１ページじゃなかったから
         $comments = $post->comments()->paginate($this->per_page, ['*'], 'page', 1);
 
         return view('admin.showComments', ['post' => $post, 'comments' => $comments]);
