@@ -21,7 +21,6 @@ class PostsController extends Controller
             $user = Auth::user();
         }
 
-        // withでn+1問題を解決
         $posts = Post::with(['comments'])->withCount('likes')->orderBy('created_at', 'desc')->paginate(10);
 
         $params = [
@@ -55,8 +54,8 @@ class PostsController extends Controller
         ];
 
         if (!empty($request->file('img'))) {
-            $path = $request->file('img')->store('');
-            $params['img'] = basename($path);
+            $path = Storage::disk('s3')->put('/', $request->file('img'), 'public');
+            $params['img'] = $path;
         }
 
         Post::create($params);
@@ -122,14 +121,14 @@ class PostsController extends Controller
         $post = Post::findOrFail($post_id);
 
         if (!empty($request->del_img)) {
-            Storage::delete($post->img);
+            Storage::disk('s3')->delete($post->img);
             $params['img'] = null;
         } elseif (!empty($request->file('img'))) {
-            $path = $request->file('img')->store('');
-            $params['img'] = basename($path);
+            $path = Storage::disk('s3')->put('/', $request->file('img'), 'public');
+            $params['img'] = $path;
 
             if (!empty($post->img)) {
-                Storage::delete($post->img);
+                Storage::disk('s3')->delete($post->img);
             }
         }
 
@@ -153,11 +152,12 @@ class PostsController extends Controller
         $post = Post::findOrFail($post_id);
 
         if (!empty($post->img)) {
-            Storage::delete($post->img);
+            Storage::disk('s3')->delete($post->img);
         }
 
         DB::transaction(function () use ($post) {
             $post->comments()->delete();
+            $post->likes()->delete();
             $post->delete();
         });
 

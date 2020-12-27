@@ -25,7 +25,7 @@ print_r($params);
                 <p class="mb-2 badge">カテゴリー : {{$post->category ? $post->category:'無し'}}</p>
             </div>
             <div class="p-2 col-6">
-                <a href="{{asset('storage/' . $post->img)}}"><img src="{{asset('storage/' . $post->img)}}"
+                <a href="{{Storage::disk('s3')->url($post->img)}}"><img src="{{Storage::disk('s3')->url($post->img)}}"
                         class="img-fluid"></a>
             </div>
         </div>

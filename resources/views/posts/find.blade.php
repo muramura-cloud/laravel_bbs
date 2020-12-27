@@ -15,7 +15,7 @@ parse_str($url['query'], $params);
     <div class="card mb-4">
         @if (!empty($post->img))
         <div class="text-center">
-            <img src="{{asset('storage/' . $post->img)}}" class="card-img-top" style="width:400px; height:300px">
+            <img src="{{Storage::disk('s3')->url($post->img)}}" class="card-img-top" style="width:400px; height:300px">
         </div>
         @endif
         <div class="card-body">

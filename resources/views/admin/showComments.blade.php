@@ -58,6 +58,7 @@
 <input type="hidden" id="current_page" value="{{$comments->currentPage()}}">
 @endsection
 
+{{-- 投稿に紐づくコメント一覧ページから投稿一覧ページに戻るボタンに設定。 --}}
 <script>
     window.onload = function(){
         if(location.search) {

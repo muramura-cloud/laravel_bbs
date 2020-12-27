@@ -28,9 +28,10 @@ class AdminController extends Controller
         return view('admin.comment', ['comments' => $comments]);
     }
 
+    // 「コメント一覧へ」ボタンを押したとき,投稿に紐づくコメントを表示
     public function showComments($post_id = null, Request $request)
     {
-        // コメント一覧のページネーションで必要。
+        // 投稿の紐づくコメントのページネーションに対応。
         if ($request['ajax'] === 'true') {
             $post = Post::findOrFail((int) $request['post_id']);
             $comments = $post->comments()->paginate($this->per_page, ['*'], 'page', (int) $request['page']);
@@ -49,11 +50,12 @@ class AdminController extends Controller
         $post = Post::findOrFail($request['post_id']);
 
         if (!empty($post->img)) {
-            Storage::delete($post->img);
+            Storage::disk('s3')->delete($post->img);
         }
 
         DB::transaction(function () use ($post) {
             $post->comments()->delete();
+            $post->likes()->delete();
             $post->delete();
         });
 
@@ -66,11 +68,12 @@ class AdminController extends Controller
             $post = Post::findOrFail((int) $post_id);
 
             if (!empty($post->img)) {
-                Storage::delete($post->img);
+                Storage::disk('s3')->delete($post->img);
             }
 
             DB::transaction(function () use ($post) {
                 $post->comments()->delete();
+                $post->likes()->delete();
                 $post->delete();
             });
         }
@@ -91,7 +94,6 @@ class AdminController extends Controller
         $post = $comment->getPost();
         $comment->delete();
 
-        // マルチをそうだけど、これ$request['current_page']ってちゃんと値取れてる？$request['page']な気がするけど。多分最初のトップページに行った時にバグる気がする。
         return response()->json($post->comments()->paginate(10, ['*'], 'page', (int) $request['current_page']));
     }
 
@@ -122,7 +124,9 @@ class AdminController extends Controller
             'title' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['title']),
             'body' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['body']),
         ];
-        // コメント一覧から投稿一覧を表示する
+
+        // 投稿に紐づくコメント一覧から投稿一覧を表示する
+        // 多分だけど、普通にページ表示するときはindexでメソッド叩いているから二回ファイルを送信していることになってる。
         if ($request['ajax'] === 'false') {
             return view('admin.index', ['posts' => $posts, 'keywords' => $keywords, 'page' => $request['page']]);
         }
@@ -155,7 +159,7 @@ class AdminController extends Controller
         return response()->json($contents);
     }
 
-    // これ多分引数でキーワードを受け取ったほうが汎用的になる。
+    // これ多分引数でキーワードを受け取ったほうが汎用的になるかも。
     private function getSearchedPosts($request)
     {
         $keywords = [
@@ -179,15 +183,14 @@ class AdminController extends Controller
                 $post['has_comments'] = true;
             }
 
-            if (!empty($post->img)) {
-                $post['img'] = asset('storage/' . $post->img);
+            if (!empty($post->img) && $request['ajax'] !== 'false') {
+                $post['img'] = Storage::disk('s3')->url($post->img);
             }
         }
 
         return $posts;
     }
 
-    // どのテーブル引数に指定するだけで良いのでは？
     private function getSearchedComments($request)
     {
         $keywords = [

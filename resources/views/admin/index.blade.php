@@ -71,8 +71,8 @@
                 <td class="td-body" tabindex="0">{{$post->body}}</td>
                 <td>
                     @if (!empty($post->img))
-                    <a href="{{asset('storage/' . $post->img)}}"><img src="{{asset('storage/' . $post->img)}}"
-                            style="width: 40px; height: 30px;"></a>
+                    <a href="{{Storage::disk('s3')->url($post->img)}}"><img
+                            src="{{Storage::disk('s3')->url($post->img)}}" style="width: 40px; height: 30px;"></a>
                     @else
                     画像なし
                     @endif

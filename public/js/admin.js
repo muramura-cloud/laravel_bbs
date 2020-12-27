@@ -120,7 +120,6 @@ setUpPaginationBtns(options);
 
 // 単一削除ボタン
 function setUpSingleDeleteBtn(options) {
-    let admin_delete_forms = document.getElementsByName('admin_delete_form');
     let admin_delete_btns = document.getElementsByName("admin_delete_btn");
 
     for (var i = 0; i < admin_delete_btns.length; i++) {
@@ -162,7 +161,6 @@ function setUpSingleDeleteBtn(options) {
 
             swal(options).then(function (value) {
                 if (value) {
-                    // これpostsいらない。
                     $('#posts_tbody').empty();
 
                     $.ajax({
@@ -317,7 +315,6 @@ $('#admin_search_btn').on('click', function () {
     }).done(function (data) {
         let html;
 
-        // dataにはページネーションオブジェクトが入るので、さらにそこに存在するdataプロパティをまわす
         $.each(data.data, function (index, value) {
             html += getPostHtml(value, data);
         });

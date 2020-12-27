@@ -15,7 +15,6 @@ print_r($params);
     <div class="border p-4">
         <h1 class="h5 mb-4">投稿の編集</h1>
 
-        {{-- htmlのフォームがput送信に対応していないからpostになっているけど、laravelでputに直している。 --}}
         <form action="{{route('posts.update',$params)}}" method="post" enctype="multipart/form-data">
             @csrf
             @method('put')
@@ -75,12 +74,12 @@ print_r($params);
                     </div>
                     @if (!empty($post->img))
                     <div class="p-2 col-6">
-                        <a href="{{asset('storage/' . $post->img)}}"><img src="{{asset('storage/' . $post->img)}}"
-                                class="img-fluid"></a>
+                        <a href="{{Storage::disk('s3')->url($post->img)}}"><img
+                                src="{{Storage::disk('s3')->url($post->img)}}" class="img-fluid"></a>
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" name="del_img" value="1" class="custom-control-input"
-                                id="custom-check-3">
-                            <label class="custom-control-label" for="custom-check-3">画像を削除</label>
+                                id="del_img">
+                            <label class="custom-control-label" for="del_img">画像を削除</label>
                         </div>
                     </div>
                     @endif
@@ -99,12 +98,12 @@ print_r($params);
 <script>
     window.onload = function(){
         let category = document.getElementById('edit_category');
-if (category.dataset.category) {
-    for (let i = 0; i < category.options.length; i++) {
-        if (category.options.item(i).value === category.dataset.category) {
-            category.options.item(i).selected = true;
+        if (category.dataset.category) {
+            for (let i = 0; i < category.options.length; i++) {
+                if (category.options.item(i).value === category.dataset.category) {
+                    category.options.item(i).selected = true;
+                }
+            }
         }
-    }
-}
     };
 </script>
