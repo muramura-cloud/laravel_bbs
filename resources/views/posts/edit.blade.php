@@ -44,7 +44,9 @@ print_r($params);
 
                 <div class="form-group">
                     <label for="edit_category"><strong>カテゴリー</strong>(任意)</label><br>
-                    <select class="form-control" id="edit_category" name="category" data-category="{{$post->category}}">
+                    {{-- これネームルーティングのカテゴリー項目とかぶっている --}}
+                    <select class="form-control" id="edit_category" name="edit_category"
+                        data-category="{{$post->category}}">
                         <option value="{{null}}">指定なし</option>
                         <option value="マクロ経済学">マクロ経済学</option>
                         <option value="ミクロ経済学">ミクロ経済学</option>
@@ -77,8 +79,7 @@ print_r($params);
                         <a href="{{Storage::disk('s3')->url($post->img)}}"><img
                                 src="{{Storage::disk('s3')->url($post->img)}}" class="img-fluid"></a>
                         <div class="custom-control custom-checkbox">
-                            <input type="checkbox" name="del_img" value="1" class="custom-control-input"
-                                id="del_img">
+                            <input type="checkbox" name="del_img" value="1" class="custom-control-input" id="del_img">
                             <label class="custom-control-label" for="del_img">画像を削除</label>
                         </div>
                     </div>

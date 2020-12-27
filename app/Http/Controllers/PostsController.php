@@ -115,7 +115,7 @@ class PostsController extends Controller
             'title' => $request->title,
             'body' => $request->body,
             'img' => $request->img,
-            'category' => $request->category,
+            'category' => $request->edit_category,
         ];
 
         $post = Post::findOrFail($post_id);
@@ -124,8 +124,7 @@ class PostsController extends Controller
             Storage::disk('s3')->delete($post->img);
             $params['img'] = null;
         } elseif (!empty($request->file('img'))) {
-            $path = Storage::disk('s3')->put('/', $request->file('img'), 'public');
-            $params['img'] = $path;
+            $params['img'] = Storage::disk('s3')->put('/', $request->file('img'), 'public');
 
             if (!empty($post->img)) {
                 Storage::disk('s3')->delete($post->img);

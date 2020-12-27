@@ -1,7 +1,5 @@
 @extends('layouts.layout')
 
-{{-- 本当はヘルパークラス（Helpers/Helper.php）をパラメーター生成で使いたいけど、なぜか、独自ヘルパークラスがうまく読み込めなくて、仕方なくここでパラメーターの配列を作る。 --}}
-{{-- あるいはjsでうまくパラメータをカスタマイズする方法もある。 --}}
 @php
 $url=parse_url(request()->fullUrl());
 parse_str($url['query'], $params);
@@ -16,7 +14,6 @@ print_r($params);
 @section('content')
 <div class="container mt-4">
     <div class="border p-4">
-        {{-- ここら辺もっと簡単にまとめられない？ --}}
         @if (!empty($post->img))
         <div class="d-flex">
             <div class="p-2 col-6">
