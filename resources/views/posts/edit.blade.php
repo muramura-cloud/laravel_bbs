@@ -7,7 +7,6 @@ parse_str($url['query'], $params);
 $params['post']=$post->id;
 $params['category']=$category;
 $params['from']=$from;
-print_r($params);
 @endphp
 
 @section('content')

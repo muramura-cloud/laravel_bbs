@@ -8,7 +8,6 @@ $params['page'] = (int) $page;
 $params['post'] = (int) $post_id;
 $params['keyword'] = (int) $keyword;
 $params['from'] = $from;
-print_r($params);
 @endphp
 
 @section('content')

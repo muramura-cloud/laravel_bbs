@@ -7,7 +7,6 @@ $params['post'] = $post->id;
 $params['category'] = $category;
 $params['target'] = 'posts';
 $params['from'] = $from;
-print_r($params);
 @endphp
 
 

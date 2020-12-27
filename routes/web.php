@@ -29,7 +29,6 @@ Route::get('/admin/comment_search/', 'App\Http\Controllers\AdminController@comme
 Route::get('/admin/reported/', 'App\Http\Controllers\AdminController@showReported');
 Route::get('/admin_comment/{post_id?}', 'App\Http\Controllers\AdminController@showComments');
 Route::get('/admin_comment_list', 'App\Http\Controllers\AdminController@comment')->name('admin_comment_list');
-
 Route::post('/admin_delete', 'App\Http\Controllers\AdminController@destroy');
 Route::post('/admin_mult_delete', 'App\Http\Controllers\AdminController@multDestroy');
 Route::post('/admin_comment_delete', 'App\Http\Controllers\AdminController@commentDestroy');
