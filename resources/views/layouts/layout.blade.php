@@ -3,13 +3,14 @@
 
     <head>
         <meta charset="UTF-8">
-        <title>Laravel BBS</title>
+        <title>立教 BBS</title>
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
             integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
         <link href="{{asset('css/post/like.css')}}" rel="stylesheet">
         <link href="{{asset('css/post/post.css')}}" rel="stylesheet">
+        <link href="{{asset('css/post/sidebar.css')}}" rel="stylesheet">
     </head>
 
     <body>
@@ -47,7 +48,6 @@
                         <option>経済数学</option>
                         <option>経営学</option>
                         <option>会計学</option>
-                        <option>経済史</option>
                         <option>経済史</option>
                         <option>簿記</option>
                         <option>金融</option>

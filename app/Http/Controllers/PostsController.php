@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Like;
+use App\Models\Category;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\PostRequest;
 use Illuminate\Support\Facades\Storage;
@@ -25,9 +26,11 @@ class PostsController extends Controller
 
         $params = [
             'posts' => $posts,
+            'ranking_loved_posts' => Post::withCount('likes')->orderBy('likes_count', 'desc')->take(5)->get(),
             'user' => $user,
             'page' => $posts->currentPage(),
             'like' => new Like,
+            'categories' => Category::all(),
         ];
 
         return view('posts.index', $params);
@@ -195,7 +198,6 @@ class PostsController extends Controller
         // 空検索の場合
         $posts = [];
 
-        // これってコメントとかwithで取得しないの？
         if (!empty($request['category'])) {
             if (!empty($keyword)) {
                 if ($request->do_name_search === '1') {
@@ -239,12 +241,14 @@ class PostsController extends Controller
 
         $params = [
             'posts' => $posts,
+            'ranking_loved_posts' => Post::withCount('likes')->orderBy('likes_count', 'desc')->take(5)->get(),
             'user' => $user,
             'page' => (int) $request->page,
             'keyword' => $keyword,
             'category' => $request['category'],
             'like' => new Like,
             'do_name_search' => $request->do_name_search,
+            'categories' => Category::all(),
         ];
 
         return view('posts.find', $params);
