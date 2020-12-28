@@ -76,15 +76,14 @@ parse_str($url['query'], $params);
                 {{ $posts->links() }}
             </div>
             @endif
-        </div>
+            <div class="mt-5">
+                <a class="btn btn-secondary" href="{{ route('top',['page'=>$page]) }}">戻る</a>
+            </div>
+        </div>        
         <div class="col-3">
             @include('components.ranking',['posts'=>$ranking_loved_posts])
             @include('components.categories',['categories' => $categories])
         </div>
     </div>
-    <div class="mt-5">
-        <a class="btn btn-secondary" href="{{ route('top',['page'=>$page]) }}">戻る</a>
-    </div>
-    <br>
 </div>
 @endsection
