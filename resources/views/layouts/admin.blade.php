@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>Laravel BBS</title>
+        <title>立教 BBS</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
             integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <link href="{{asset('css/admin/admin.css')}}" rel="stylesheet">
@@ -12,14 +12,11 @@
 
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <a class="navbar-brand" href="{{ url('') }}">Laravel BBS</a>
+            <a class="navbar-brand" href="{{ url('') }}">立教 BBS</a>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
-                        <a class="nav-link" href="/">トップページ<span class="sr-only">(current)</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled" href="{{route('dashboard')}}">Disabled</a>
+                        <a class="nav-link" href="/">トップ<span class="sr-only">(current)</span></a>
                     </li>
                 </ul>
             </div>
