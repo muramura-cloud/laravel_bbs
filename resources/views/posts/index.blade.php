@@ -69,6 +69,7 @@
             </div>
         </div>
         <div class="col-3">
+            <br><br><br>
             @include('components.ranking',['posts' => $ranking_loved_posts])
             @include('components.categories',['categories' => $categories])
         </div>

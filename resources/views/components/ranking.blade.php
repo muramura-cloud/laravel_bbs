@@ -1,4 +1,4 @@
-<h2 class="heading bg-dark text-center rounded">ランキング</h2>
+<h3 class="heading bg-dark text-center rounded">ランキング</h3>
 <ol class="ranking">
     @foreach ($posts as $post)
     <li class="ranking-item border-bottom">

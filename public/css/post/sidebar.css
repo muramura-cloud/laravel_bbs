@@ -1,7 +1,8 @@
 .heading {
-  padding: 10px 12px;
+  padding: 8px 8px;
   letter-spacing: 1px;
   color: white;
+  font-weight: bold;
 }
 
 .ranking,
