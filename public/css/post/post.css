@@ -1,7 +1,17 @@
+html {
+  position: relative;
+}
+
 .post-body {
   max-height: 300px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
 }
 /*# sourceMappingURL=post.css.map */
