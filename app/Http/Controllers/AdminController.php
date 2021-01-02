@@ -143,7 +143,7 @@ class AdminController extends Controller
 
     public function showReported(Request $request)
     {
-        $ids = array_column(Report::where('table_n００ame', $request->table_name)->get('target_id')->toArray(), 'target_id');
+        $ids = array_column(Report::where('table_name', $request->table_name)->get('target_id')->toArray(), 'target_id');
 
         $model = new Post;
         if ($request->table_name === 'comments') {
