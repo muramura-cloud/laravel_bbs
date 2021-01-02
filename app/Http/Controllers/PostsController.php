@@ -36,6 +36,11 @@ class PostsController extends Controller
         return view('posts.index', $params);
     }
 
+    public function introduce()
+    {
+        return view('posts.introduce', ['categories' => Category::all(), 'ranking_loved_posts' => Post::withCount('likes')->orderBy('likes_count', 'desc')->take(5)->get()]);
+    }
+
     public function create(Request $request)
     {
         $user = null;

@@ -34,6 +34,9 @@
                     <li class="nav-item">
                         <a class="nav-link disabled" href="{{route('admin_top')}}">管理者</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="{{route('introduce')}}">アプリの説明</a>
+                    </li>
                 </ul>
                 <form class="form-inline my-2 my-lg-0" method="get" action="{{route('search')}}">
                     @csrf

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 // トップページ
 Route::get('/', 'App\Http\Controllers\PostsController@index')->name('top');
+Route::get('/introduce', 'App\Http\Controllers\PostsController@introduce')->name('introduce');
 Route::get('/search', 'App\Http\Controllers\PostsController@search')->name('search');
 Route::post('/ajaxlike', 'App\Http\Controllers\PostsController@ajaxlike');
 
