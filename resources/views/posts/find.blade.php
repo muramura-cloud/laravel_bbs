@@ -76,7 +76,7 @@ parse_str($url['query'], $params);
                 {{ $posts->links() }}
             </div>
             @endif
-            <div class="mt-5">
+            <div class="my-5">
                 <a class="btn btn-secondary" href="{{ route('top',['page'=>$page]) }}">戻る</a>
             </div>
         </div>        

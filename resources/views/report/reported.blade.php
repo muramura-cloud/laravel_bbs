@@ -19,4 +19,5 @@ $params['from'] = $from;
         <a class="btn btn-secondary" href="{{ route('posts.show',$params) }}">戻る</a>
     </div>
 </div>
+
 @endsection

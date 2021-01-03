@@ -1,5 +1,6 @@
 html {
     position: relative;
+    min-height:100%;
 }
 
 .post-body {
@@ -7,6 +8,10 @@ html {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.content {
+    margin-bottom: 50px;
 }
 
 .footer {

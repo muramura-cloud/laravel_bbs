@@ -84,11 +84,11 @@
             </div>
         </nav>
 
-        <div class="content mb-4">
+        <div class="content">
             @yield('content')
         </div>
 
-        <footer class="footer bg-dark">
+        <footer class="footer bg-dark mt-5">
             <div class="container">
                 <p class="text-muted text-center p-2">copyright 村田陸</p>
             </div>

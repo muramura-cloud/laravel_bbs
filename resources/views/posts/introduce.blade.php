@@ -5,6 +5,7 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-9">
+            <br><br>
             <h2>アプリの説明</h2>
             <br>
             <p>大学の課題でわからない箇所を「<strong>投稿</strong>」してみんなと共有しよう。</p>
