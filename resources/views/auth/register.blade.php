@@ -39,5 +39,8 @@
                 </x-jet-button>
             </div>
         </form>
+        <div class="mt-5">
+            <a class="btn btn-secondary" href="{{ route('top') }}">戻る</a>
+        </div>
     </x-jet-authentication-card>
 </x-guest-layout>
