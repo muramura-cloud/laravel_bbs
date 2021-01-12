@@ -18,7 +18,7 @@ $(function () {
         if ($this.data('user') === 'not_login') {
             swal(options).then(function (value) {
                 if (value) {
-                    window.location.href = location.href + 'login';
+                    location.href = 'http://' + location.host + '/login';
                 }
             });
 
@@ -26,10 +26,10 @@ $(function () {
         }
 
         $.ajax({
-            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
             type: 'POST',
             url: '/ajaxlike',
-            data: {'post_id': $this.data('postid')},
+            data: { 'post_id': $this.data('postid') },
             dataType: 'json',
         }).done(function (data) {
             $this.children('i').toggleClass('loved');
