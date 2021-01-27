@@ -14,7 +14,6 @@ $(function () {
 
         let $this = $(this);
 
-        // ログインしていないなら
         if ($this.data('user') === 'not_login') {
             swal(options).then(function (value) {
                 if (value) {
