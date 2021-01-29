@@ -39,8 +39,7 @@
             <div class="card mb-4">
                 @if (!empty($post->img))
                 <div class="text-center">
-                    <img src="{{Storage::disk('s3')->url($post->img)}}" class="card-img-top"
-                        style="width:400px; height:300px">
+                    <img src="{{Storage::disk('s3')->url($post->img)}}" class="card-img-top post-img">
                 </div>
                 @endif
                 <div class="card-body">
@@ -99,8 +98,7 @@
             <div class="card mb-4">
                 @if (!empty($post->img))
                 <div class="text-center">
-                    <img src="{{Storage::disk('s3')->url($post->img)}}" class="card-img-top"
-                        style="width:400px; height:300px">
+                    <img src="{{Storage::disk('s3')->url($post->img)}}" class="card-img-top post-img">
                 </div>
                 @endif
                 <div class="card-body">
@@ -181,21 +179,20 @@
     window.onload = function(){
         let queries=getUrlQueries();
         if(!jQuery.isEmptyObject(queries)) {
-            let tab_id=queries.from;
-
-            let nav_links=document.getElementsByClassName('nav-link');
+            let tab_id = queries.from;
+            let nav_links = document.getElementsByClassName('nav-link');
             for(let i = 0; i < nav_links.length; i++) {
                 nav_links[i].classList.remove('active');
-                if(nav_links[i].getAttribute('href')===`#${tab_id.replace('user_','')}`) {
+                if(nav_links[i].getAttribute('href') === `#${tab_id.replace('user_','')}`) {
                     console.log(tab_id);
                     nav_links[i].classList.add('active');
                 }
             }
 
-            let tab_panes=document.getElementsByClassName('tab-pane');
+            let tab_panes = document.getElementsByClassName('tab-pane');
             for(let i = 0; i < tab_panes.length; i++) {
                 tab_panes[i].classList.remove('active');
-                if(tab_panes[i].getAttribute('id')===tab_id.replace('user_','')) {
+                if(tab_panes[i].getAttribute('id') === tab_id.replace('user_','')) {
                     console.log(tab_id);
                     tab_panes[i].classList.add('active');
                 }

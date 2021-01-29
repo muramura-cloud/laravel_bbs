@@ -10,13 +10,13 @@ parse_str($url['query'], $params);
 
 <div class="container mt-4">
     <div class="row">
-        <div class="col-9">
+        <div class="col-md-9">
             <h2>検索結果</h2><br>
             @forelse ($posts as $post)
             <div class="card mb-4">
                 @if (!empty($post->img))
                 <div class="text-center">
-                    <img src="{{Storage::disk('s3')->url($post->img)}}" class="card-img-top"
+                    <img src="{{Storage::disk('s3')->url($post->img)}}" class="card-img-top post-img"
                         style="width:400px; height:300px">
                 </div>
                 @endif
@@ -80,7 +80,7 @@ parse_str($url['query'], $params);
                 <a class="btn btn-secondary" href="{{ route('top',['page'=>$page]) }}">戻る</a>
             </div>
         </div>        
-        <div class="col-3">
+        <div class="col-md-3">
             <br><br><br>
             @include('components.ranking',['posts'=>$ranking_loved_posts])
             @include('components.categories',['categories' => $categories])

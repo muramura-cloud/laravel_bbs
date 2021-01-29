@@ -4,7 +4,7 @@
 
 <div class="container mt-4">
     <div class="row">
-        <div class="col-9">
+        <div class="col-md-9">
             <div class="mb-4">
                 <a href="{{ route('posts.create') }}" class="btn btn-primary">
                     投稿を新規作成する
@@ -15,8 +15,7 @@
             <div class="card mb-4">
                 @if (!empty($post->img))
                 <div class="text-center">
-                    <img src="{{Storage::disk('s3')->url($post->img)}}" class="card-img-top"
-                        style="width:400px; height:300px">
+                    <img src="{{Storage::disk('s3')->url($post->img)}}" class="card-img-top post-img">
                 </div>
                 @endif
                 <div class="card-body">
@@ -68,7 +67,7 @@
                 {{ $posts->links() }}
             </div>
         </div>
-        <div class="col-3">
+        <div class="col-md-3">
             <br><br><br>
             @include('components.ranking',['posts' => $ranking_loved_posts])
             @include('components.categories',['categories' => $categories])
