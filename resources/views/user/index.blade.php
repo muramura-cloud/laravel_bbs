@@ -52,7 +52,8 @@
 
                             <input type="hidden" name="page" value="{{$posts->currentPage()}}">
                             <input type="hidden" name="from" value="user_my_posts">
-                            <button class="btn btn-success">続きを読む</button>
+                            <button class="btn btn-success details_btn" data-postid="{{ $post->id }}"
+                                data-page="{{$posts->currentPage()}}" data-from="user_my_posts">続きを読む</button>
                         </form>
                     </div>
                 </div>
@@ -62,6 +63,8 @@
                         <span
                             class="badge badge-primary">{{$post->comments->count() ? 'コメント'.$post->comments->count().'件':''}}</span>
                         <span class="ml-2 badge badge-info">{{$post->category ? $post->category : ''}}</span>
+                        <span
+                            class="ml-2 badge badge-warning">{{in_array($post->id,$unread_post_ids,true) ? 'コメント未読' : ''}}</span>
                     </div>
                     <div class="fav">
                         @if($user && $like->like_exist($user->id,$post->id))

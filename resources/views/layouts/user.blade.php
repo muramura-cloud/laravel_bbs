@@ -65,10 +65,10 @@
             integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous">
         </script>
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script src="{{ asset('js/functions.js') }}"></script>
         <script src="{{ asset('js/btn.js') }}"></script>
         <script src="{{ asset('js/like.js') }}"></script>
-        <script src="{{ asset('js/report.js') }}"></script>
-        <script src="{{ asset('js/functions.js') }}"></script>
+        <script src="{{ asset('js/read.js') }}"></script>
     </body>
 
 </html>

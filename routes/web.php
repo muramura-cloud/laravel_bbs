@@ -10,6 +10,7 @@ Route::post('/ajaxlike', 'App\Http\Controllers\PostsController@ajaxlike');
 
 // ユーザーページ
 Route::get('/user', 'App\Http\Controllers\UsersController@index')->name('user_top');
+Route::get('/user/read', 'App\Http\Controllers\UsersController@read');
 
 // 投稿
 Route::resource('posts', 'App\Http\Controllers\PostsController', ['only' => ['create', 'store', 'show', 'edit', 'update', 'destroy']]);

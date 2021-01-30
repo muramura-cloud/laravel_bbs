@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Post;
+use App\Models\Read;
 use App\Models\Comment;
 use App\Http\Requests\CommentRequest;
 use Illuminate\Support\Facades\Auth;
@@ -19,9 +20,12 @@ class CommentsController extends Controller
         ];
 
         $post = Post::findOrFail($params['post_id']);
-        // createメソッドを呼ぶことで、インスタンスの作成→属性の代入→データの保存を一気通貫でやってくれる
-        // ただし、createメソッドを使う場合はモデルのプロパティにguarded(ブラックリスト)あるいはfillable（ホワイトリスト）を設定する必要がある。
         $post->comments()->create($params);
+        // そこ投稿がログインユーザーのものかどうかを確認する、出ないなら、既読処理はないから、レコードに追加しない。
+
+        if (empty(Auth::id()) || Auth::id() !== $post->user->id) {
+            Read::create(['post_id' => $request->post_id, 'is_read' => 0,]);
+        }
 
         $params = [
             'post' => $post,

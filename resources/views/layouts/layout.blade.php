@@ -107,7 +107,6 @@
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <script src="{{ asset('js/btn.js') }}"></script>
         <script src="{{ asset('js/like.js') }}"></script>
-        <script src="{{ asset('js/report.js') }}"></script>
     </body>
 
 </html>

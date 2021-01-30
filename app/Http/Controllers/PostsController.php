@@ -7,11 +7,11 @@ use App\Models\Post;
 use App\Models\User;
 use App\Models\Like;
 use App\Models\Category;
-use Illuminate\Support\Facades\DB;
 use App\Http\Requests\PostRequest;
+use App\Helpers\Helper;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
-use App\Helpers\Helper;
 
 class PostsController extends Controller
 {
