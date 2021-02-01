@@ -36,9 +36,6 @@ class UsersController extends Controller
             })->with(['comments'])->withCount('likes')->orderBy('created_at', 'desc')->paginate($this->per_page, ['*'], 'page', 1);
         }
 
-        $comments = Comment::where('user_id', $auth->id)->paginate($this->per_page);
-
-        // readsテーブルからこのユーザーの投稿したpost_idを含んでいるものを取得する。
         $post_ids = $user->posts()->get('id')->toArray();
         $unread_post_ids = [];
         if (!empty($post_ids)) {
@@ -48,16 +45,13 @@ class UsersController extends Controller
                     $read_query->orWhere('post_id', $id)->where('is_read', false);
                 }
             })->get('post_id')->toArray();
-
-            // Helper::dump($unread_post_ids);
-            // exit;
         }
 
         $params = [
             'user' => $auth,
             'posts' => $posts->paginate($this->per_page),
             'loved_posts' => $loved_posts,
-            'comments' => $comments,
+            'comments' => Comment::where('user_id', $auth->id)->paginate($this->per_page),
             'like' => new Like,
             'unread_post_ids' => !empty($unread_post_ids) ? array_column($unread_post_ids, 'post_id') : [],
         ];

@@ -23,7 +23,9 @@
 
     <ul class="nav nav-tabs">
         <li class="nav-item">
-            <a href="#my_posts" class="nav-link active" data-toggle='tab'>自分の投稿</a>
+            <a href="#my_posts" class="nav-link active" data-toggle='tab'>自分の投稿
+                <span class="ml-2 badge badge-warning">{{!empty($unread_post_ids) ? '未読':''}}</span>
+            </a>
         </li>
         <li class="nav-item">
             <a href="#my_loved_posts" class="nav-link" data-toggle='tab'>イイねした投稿</a>
@@ -164,6 +166,16 @@
                     <time
                         class="text-secondary">{{ $comment->created_at ? $comment->created_at->format('Y.m.d H:i') : '' }}</time>
                     <p class="mt-2">{{$comment->body}}</p>
+                    <div class="mb-1">
+                        <form style="display: inline-block;" method="get"
+                            action="{{ route('posts.show', ['post' => $comment->getPost()->id]) }}">
+                            @csrf
+
+                            <input type="hidden" name="page" value="{{$comments->currentPage()}}">
+                            <input type="hidden" name="from" value="user_my_comments">
+                            <button class="btn btn-success">投稿を読む</button>
+                        </form>
+                    </div>
                 </div>
             </div>
             @empty

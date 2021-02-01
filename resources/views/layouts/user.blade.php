@@ -51,7 +51,7 @@
 
         <footer class="footer bg-dark mt-5">
             <div class="container">
-                <p class="text-muted text-center p-2">copyright 村田陸</p>
+                <p class="text-muted text-center mt-2 p-2">copyright 村田陸</p>
             </div>
         </footer>
 
