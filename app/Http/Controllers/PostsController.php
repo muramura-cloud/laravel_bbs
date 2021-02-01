@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Models\User;
 use App\Models\Like;
 use App\Models\Category;
+use App\Models\Read;
 use App\Http\Requests\PostRequest;
 use App\Helpers\Helper;
 use Illuminate\Support\Facades\DB;
@@ -87,6 +88,11 @@ class PostsController extends Controller
         $user = null;
         if (Auth::check()) {
             $user = Auth::user();
+
+            // 既読処理
+            if (Post::findOrFail($post_id)->user_id === $user->id) {
+                Read::where('post_id', $post_id)->delete();
+            }
         }
 
         $post = Post::withCount('likes')->findOrFail($post_id);

@@ -40,7 +40,6 @@ class UsersController extends Controller
 
         // readsテーブルからこのユーザーの投稿したpost_idを含んでいるものを取得する。
         $post_ids = $user->posts()->get('id')->toArray();
-
         $unread_post_ids = [];
         if (!empty($post_ids)) {
             $post_ids = array_column($post_ids, 'id');

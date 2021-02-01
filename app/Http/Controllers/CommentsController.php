@@ -21,10 +21,16 @@ class CommentsController extends Controller
 
         $post = Post::findOrFail($params['post_id']);
         $post->comments()->create($params);
-        // そこ投稿がログインユーザーのものかどうかを確認する、出ないなら、既読処理はないから、レコードに追加しない。
 
-        if (empty(Auth::id()) || Auth::id() !== $post->user->id) {
-            Read::create(['post_id' => $request->post_id, 'is_read' => 0,]);
+        // コメントされた投稿を未読テーブルに追加
+        if (!empty($post->user_id)) {
+            if (empty(Auth::id()) || Auth::id() !== $post->user->id) {
+                Read::create([
+                    'post_id' => $request->post_id,
+                    'comment_id' => Comment::all()->last()->id,
+                    'is_read' => 0,
+                ]);
+            }
         }
 
         $params = [
@@ -89,6 +95,8 @@ class CommentsController extends Controller
         $comment = Comment::findOrFail($comment_id);
 
         $comment->delete();
+
+        Read::where('comment_id', $comment_id)->delete();
 
         $params = [
             'post' => $comment->getPost(),
