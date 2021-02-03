@@ -37,12 +37,17 @@ class Post extends Model
         return $this->belongsTo('App\Models\User');
     }
 
-    public function getPostsByKeyword($keyword)
+    public function getPostsByKeyword($keyword, $page = null)
     {
-        $posts = $this::with(['comments'])->withCount('likes')->where('title', 'LIKE', "%{$keyword}%")
-            ->orWhere('body', 'LIKE', "%{$keyword}%")->orderBy('created_at', 'desc')->paginate(10);
+        $posts = $this::with(['comments'])->withCount('likes')
+            ->where('title', 'LIKE', "%{$keyword}%")
+            ->orWhere('body', 'LIKE', "%{$keyword}%")->orderBy('created_at', 'desc');
 
-        return $posts;
+        if (!empty($page)) {
+            return $posts->paginate(10, ['*'], 'page', $page);
+        } else {
+            return $posts->paginate(10);
+        }
     }
 
     public function getPostsByCategoryAndKeyword($category, $keyword)
@@ -76,5 +81,19 @@ class Post extends Model
             })->orderBy('created_at', 'desc')->paginate(10);
 
         return $posts;
+    }
+
+    public function getLikePosts($like_post_ids)
+    {
+        $like_posts = [];
+        if (!empty($like_post_ids)) {
+            $like_posts = Post::where(function ($post_query) use ($like_post_ids) {
+                foreach ($like_post_ids as $id) {
+                    $post_query->orWhere('id', $id);
+                }
+            })->with(['comments'])->withCount('likes')->orderBy('created_at', 'desc')->paginate(10, ['*'], 'page', 1);
+        }
+
+        return $like_posts;
     }
 }

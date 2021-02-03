@@ -112,6 +112,5 @@
 <div id="pagination_btns" class="d-flex justify-content-center mb-5">
     {{ $posts->links() }}
 </div>
-{{-- 現在ページを --}}
 <input type="hidden" id="current_page" value="{{$posts->currentPage()}}">
 @endsection

@@ -212,6 +212,7 @@ class PostsController extends Controller
         return redirect()->route('top', ['page' => (int) $request->page]);
     }
 
+    // 投稿検索
     public function search(Request $request)
     {
         $user = null;

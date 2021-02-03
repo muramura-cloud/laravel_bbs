@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class CommentsController extends Controller
 {
+    // コメント保存
     public function store(CommentRequest $request)
     {
         $params = [
@@ -45,6 +46,7 @@ class CommentsController extends Controller
         return redirect()->route('posts.show', $params);
     }
 
+    // コメント編集ページを表示
     public function edit($comment_id, Request $request)
     {
         $user = null;
@@ -68,15 +70,12 @@ class CommentsController extends Controller
         return view('comments.edit', $params);
     }
 
+    // コメント編集
     public function update($comment_id, CommentRequest $request)
     {
         $comment = Comment::findOrFail($comment_id);
 
-        $params = [
-            'body' => $request->body,
-        ];
-
-        $comment->fill($params)->save();
+        $comment->fill(['body' => $request->body])->save();
 
         $params = [
             'post' => $comment->getPost(),
@@ -90,6 +89,7 @@ class CommentsController extends Controller
         return redirect()->route('posts.show', $params);
     }
 
+    // コメント削除
     public function destroy($comment_id, Request $request)
     {
         $comment = Comment::findOrFail($comment_id);

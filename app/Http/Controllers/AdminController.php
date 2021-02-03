@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\Comment;
 use App\Models\Report;
+use App\Models\Read;
 use App\Helpers\Helper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -14,6 +15,7 @@ class AdminController extends Controller
 {
     private $per_page = 10;
 
+    // トップページ(投稿一覧ページを表示)
     public function index()
     {
         $posts = Post::with(['comments'])->orderBy('created_at', 'desc')->paginate(10);
@@ -21,6 +23,7 @@ class AdminController extends Controller
         return view('admin.index', ['posts' => $posts]);
     }
 
+    // コメント一覧ページを表示
     public function comment()
     {
         $comments = Comment::paginate(10);
@@ -83,30 +86,26 @@ class AdminController extends Controller
 
     public function commentDestroy(Request $request)
     {
+        Read::where('comment_id', $request['comment_id'])->delete();
         $comment = Comment::findOrFail((int) $request['comment_id']);
+        $comment->delete();
 
+        // コメント一覧ページから削除した場合
         if ($request['show_comment_list']) {
-            $comment->delete();
-
             return response()->json($this->getSearchedComments($request));
         }
 
-        $post = $comment->getPost();
-        $comment->delete();
-
-        return response()->json($post->comments()->paginate(10, ['*'], 'page', (int) $request['current_page']));
+        return response()->json($comment->getPost()->comments()->paginate(10, ['*'], 'page', (int) $request['current_page']));
     }
 
     public function commentMultDestroy(Request $request)
     {
         foreach ($request['comment_ids'] as $comment_id) {
-            $comment = Comment::findOrFail((int) $comment_id);
-
-            DB::transaction(function () use ($comment) {
-                $comment->delete();
-            });
+            Read::where('comment_id', (int) $comment_id)->delete();
+            Comment::findOrFail((int) $comment_id)->delete();
         }
 
+        // コメント一覧ページから削除した場合
         if ($request['show_comment_list']) {
             return response()->json($this->getSearchedComments($request));
         }
@@ -116,6 +115,7 @@ class AdminController extends Controller
         return response()->json($post->comments()->paginate(10, ['*'], 'page', (int) $request['current_page']));
     }
 
+    // 投稿検索
     public function search(Request $request)
     {
         $posts = $this->getSearchedPosts($request);
@@ -125,8 +125,7 @@ class AdminController extends Controller
             'body' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['body']),
         ];
 
-        // 投稿に紐づくコメント一覧から投稿一覧を表示する
-        // 多分だけど、普通にページ表示するときはindexでメソッド叩いているから二回ファイルを送信していることになってる。
+        // 投稿に紐づくコメント一覧からトップページ(投稿一覧)を表示する場合
         if ($request['ajax'] === 'false') {
             return view('admin.index', ['posts' => $posts, 'keywords' => $keywords, 'page' => $request['page']]);
         }
@@ -134,32 +133,24 @@ class AdminController extends Controller
         return response()->json($posts);
     }
 
+    // コメント検索
     public function commentSearch(Request $request)
     {
-        $comments = $this->getSearchedComments($request);
-
-        return response()->json($comments);
+        return response()->json($this->getSearchedComments($request));
     }
 
+    // 報告された投稿あるいはコメントを表示する。
     public function showReported(Request $request)
     {
-        $ids = array_column(Report::where('table_name', $request->table_name)->get('target_id')->toArray(), 'target_id');
-
+        $report = new Report;
         $model = new Post;
         if ($request->table_name === 'comments') {
             $model = new Comment;
         }
 
-        $contents = $model::where(function ($post_query) use ($ids) {
-            foreach ($ids as $id) {
-                $post_query->orWhere('id', $id);
-            }
-        })->orderBy('created_at', 'desc')->paginate($this->per_page, ['*'], 'page', (int) $request['page']);
-
-        return response()->json($contents);
+        return response()->json($report->getReportedContents($model, $report->getReportedContentIds($request['table_name']), $request['page']));
     }
 
-    // これ多分引数でキーワードを受け取ったほうが汎用的になるかも。
     private function getSearchedPosts($request)
     {
         $keywords = [

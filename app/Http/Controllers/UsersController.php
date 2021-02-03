@@ -15,51 +15,31 @@ class UsersController extends Controller
 {
     private $per_page = 10;
 
+    // ユーザーページを表示 自分の投稿、自分がいいねした投稿、自分のコメントを確認できる。未読のコメントがあったら通知する
     public function index()
     {
         $auth = null;
         if (Auth::check()) {
             $auth = Auth::user();
         }
-
         $user = User::find($auth->id);
-
-        $posts = $user->posts()->with(['comments'])->withCount('likes')->orderBy('created_at', 'desc');
-
-        $loved_post_ids = Like::where('user_id', $auth->id)->get('post_id')->toArray();
-        $loved_posts = [];
-        if (!empty($loved_post_ids)) {
-            $loved_posts = Post::where(function ($post_query) use ($loved_post_ids) {
-                foreach ($loved_post_ids as $id) {
-                    $post_query->orWhere('id', $id);
-                }
-            })->with(['comments'])->withCount('likes')->orderBy('created_at', 'desc')->paginate($this->per_page, ['*'], 'page', 1);
-        }
-
-        $post_ids = $user->posts()->get('id')->toArray();
-        $unread_post_ids = [];
-        if (!empty($post_ids)) {
-            $post_ids = array_column($post_ids, 'id');
-            $unread_post_ids = Read::where(function ($read_query) use ($post_ids) {
-                foreach ($post_ids as $id) {
-                    $read_query->orWhere('post_id', $id)->where('is_read', false);
-                }
-            })->get('post_id')->toArray();
-        }
+        $post = new Post;
+        $read = new Read;
+        $unread_post_ids = $read->getUnreadPostIds($user->posts()->get('id')->toArray());
 
         $params = [
             'user' => $auth,
-            'posts' => $posts->paginate($this->per_page),
-            'loved_posts' => $loved_posts,
+            'posts' => $user->posts()->with(['comments'])->withCount('likes')->orderBy('created_at', 'desc')->paginate($this->per_page),
+            'loved_posts' => $post->getLikePosts(Like::where('user_id', $auth->id)->get('post_id')->toArray()),
             'comments' => Comment::where('user_id', $auth->id)->paginate($this->per_page),
-            'like' => new Like,
             'unread_post_ids' => !empty($unread_post_ids) ? array_column($unread_post_ids, 'post_id') : [],
+            'like' => new Like,
         ];
 
         return view('user.index', $params);
     }
 
-    // コメントが削除された時とかも既読処理を考えたないとな。
+    // 既読処理
     public function read(Request $request)
     {
         Read::where('post_id', $request['post_id'])->delete();

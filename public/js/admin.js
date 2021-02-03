@@ -103,9 +103,8 @@ function setUpPaginationBtns(options) {
                 setUpMultDeleteBtn(options);
                 setUpPaginationBtns(options);
 
-                // これコメントがの場合はどうなる？
                 if (data.data.length === 0) {
-                    $('#posts_table').after('<p class="text-center mt-5 search-null">検索に一致する投稿は存在しません。</p>');
+                    $('#posts_tbody').append('<p class="text-center mt-5 search-null">検索に一致する投稿は存在しません。</p>');
                 }
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 console.log("ajax通信に失敗しました");
@@ -186,7 +185,7 @@ function setUpSingleDeleteBtn(options) {
                         setUpMultDeleteBtn(options);
 
                         if (data.data.length === 0) {
-                            $('#posts_table').after('<p class="text-center mt-5 search-null">検索に一致する投稿は存在しません。</p>');
+                            $('#posts_tbody').append('<p class="text-center mt-5 search-null">検索に一致する投稿は存在しません。</p>');
                         }
                     }).fail(function (jqXHR, textStatus, errorThrown) {
                         console.log("ajax通信に失敗しました");
@@ -280,7 +279,7 @@ function setUpMultDeleteBtn(options) {
                         setUpMultDeleteBtn(options);
 
                         if (data.data.length === 0) {
-                            $('#posts_table').after('<p class="text-center mt-5 search-null">検索に一致する投稿は存在しません。</p>');
+                            $('#posts_tbody').append('<p class="text-center mt-5 search-null">検索に一致する投稿は存在しません。</p>');
                         }
                     }).fail(function (jqXHR, textStatus, errorThrown) {
                         console.log("ajax通信に失敗しました");
@@ -327,7 +326,7 @@ $('#admin_search_btn').on('click', function () {
         setUpPaginationBtns(options);
 
         if (data.data.length === 0) {
-            $('#posts_table').after('<p class="text-center mt-5 search-null">投稿が見つかりません</p>');
+            $('#posts_tbody').append('<p class="text-center mt-5 search-null">投稿が見つかりません</p>');
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
         console.log("ajax通信に失敗しました");
@@ -366,7 +365,7 @@ $('#reported_posts_btn').on('click', function () {
         setUpPaginationBtns(options);
 
         if (data.data.length === 0) {
-            $('#posts_table').after('<p class="text-center mt-5 search-null">投稿が見つかりません</p>');
+            $('#posts_tbody').append('<p class="text-center mt-5 search-null">投稿が見つかりません</p>');
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
         console.log("ajax通信に失敗しました");
@@ -407,7 +406,7 @@ $('#comment_search_btn').on('click', function () {
         setUpPaginationBtns(options);
 
         if (data.data.length === 0) {
-            $('#posts_table').after('<p class="text-center mt-5 search-null">コメントが見つかりません</p>');
+            $('#posts_tbody').append('<p class="text-center mt-5 search-null">コメントが見つかりません</p>');
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
         console.log("ajax通信に失敗しました");
@@ -446,7 +445,7 @@ $('#reported_comments_btn').on('click', function () {
         setUpPaginationBtns(options);
 
         if (data.data.length === 0) {
-            $('#posts_table').after('<p class="text-center mt-5 search-null">投稿が見つかりません</p>');
+            $('#posts_tbody').append('<p class="text-center mt-5 search-null">投稿が見つかりません</p>');
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
         console.log("ajax通信に失敗しました");
