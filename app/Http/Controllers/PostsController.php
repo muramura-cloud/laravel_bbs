@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 
 class PostsController extends Controller
 {
+    // トップページを表示
     public function index()
     {
         $user = null;
@@ -27,16 +28,16 @@ class PostsController extends Controller
 
         $params = [
             'posts' => $posts,
-            'ranking_loved_posts' => Post::withCount('likes')->orderBy('likes_count', 'desc')->take(5)->get(),
             'user' => $user,
-            'page' => $posts->currentPage(),
             'like' => new Like,
+            'ranking_loved_posts' => Post::withCount('likes')->orderBy('likes_count', 'desc')->take(5)->get(),
             'categories' => Category::all(),
         ];
 
         return view('posts.index', $params);
     }
 
+    // アプリ説明ページを表示
     public function introduce()
     {
         $user = null;
@@ -46,13 +47,14 @@ class PostsController extends Controller
 
         $params = [
             'user' => $user,
-            'categories' => Category::all(),
             'ranking_loved_posts' => Post::withCount('likes')->orderBy('likes_count', 'desc')->take(5)->get(),
+            'categories' => Category::all(),
         ];
 
         return view('posts.introduce', $params);
     }
 
+    // 投稿の新規作成ページを表示
     public function create(Request $request)
     {
         $user = null;
@@ -63,6 +65,7 @@ class PostsController extends Controller
         return view('posts.create', ['user' => $user, 'page' => $request->page]);
     }
 
+    // 投稿保存
     public function store(PostRequest $request)
     {
         $params = [
@@ -73,6 +76,7 @@ class PostsController extends Controller
             'category' => $request->category,
         ];
 
+        // 画像があるならS3へ保存
         if (!empty($request->file('img'))) {
             $path = Storage::disk('s3')->put('/', $request->file('img'), 'public');
             $params['img'] = $path;
@@ -83,22 +87,21 @@ class PostsController extends Controller
         return redirect()->route('top');
     }
 
+    // 投稿詳細ページを表示
     public function show($post_id, Request $request)
     {
         $user = null;
         if (Auth::check()) {
             $user = Auth::user();
 
-            // 既読処理
+            // 既読処理 表示している投稿が自分が投稿したものだった場合、コメントを既読したことにする。
             if (Post::findOrFail($post_id)->user_id === $user->id) {
                 Read::where('post_id', $post_id)->delete();
             }
         }
 
-        $post = Post::withCount('likes')->findOrFail($post_id);
-
         $params = [
-            'post' => $post,
+            'post' => Post::withCount('likes')->findOrFail($post_id),
             'page' => $request->page,
             'user' => $user,
             'keyword' => $request->keyword,
@@ -111,6 +114,7 @@ class PostsController extends Controller
         return view('posts.show', $params);
     }
 
+    // 投稿編集ページを表示
     public function edit($post_id, Request $request)
     {
         $user = null;
@@ -118,12 +122,10 @@ class PostsController extends Controller
             $user = Auth::user();
         }
 
-        $post = Post::findOrFail($post_id);
-
         $params = [
-            'post' => $post,
-            'page' => $request->page,
             'user' => $user,
+            'post' => Post::findOrFail($post_id),
+            'page' => $request->page,
             'keyword' => $request->keyword,
             'category' => $request->category,
             'do_name_search' => $request->do_name_search,
@@ -133,6 +135,7 @@ class PostsController extends Controller
         return view('posts.edit', $params);
     }
 
+    // 投稿編集
     public function update($post_id, PostRequest $request)
     {
         // 更新するデータ
@@ -145,6 +148,7 @@ class PostsController extends Controller
 
         $post = Post::findOrFail($post_id);
 
+        // 「画像削除ボタン」が押されていたら、画像を削除して、新しい画像がセットされていたら、画像を差し替える
         if (!empty($request->del_img)) {
             Storage::disk('s3')->delete($post->img);
             $params['img'] = null;
@@ -158,7 +162,7 @@ class PostsController extends Controller
 
         $post->fill($params)->save();
 
-        // ルーティングデータ
+        // ページ遷移ようのパラメーター
         $params = [
             'post' => $post,
             'page' => $request->page,
@@ -171,6 +175,7 @@ class PostsController extends Controller
         return redirect()->route('posts.show', $params);
     }
 
+    // 投稿削除
     public function destroy($post_id, Request $request)
     {
         $post = Post::findOrFail($post_id);
@@ -193,15 +198,17 @@ class PostsController extends Controller
             'from' => $request->from
         ];
 
+        // ユーザーぺージから投稿を削除した場合はユーザーページへ戻る
         if (strpos($request->from, 'user') !== false) {
             return redirect()->route('user_top', $params);
         }
 
-        // キーワードが送られてきたり、カテゴリーが送られてきたら再度検索して表示する。
+        // 検索結果ページからの削除をした場合は検索結果ページへ戻る
         if (!empty($request->keyword) || !empty($request->category)) {
             return redirect()->route('search', $params);
         }
 
+        // トップページからの削除をした場合はトップページへ戻る
         return redirect()->route('top', ['page' => (int) $request->page]);
     }
 
@@ -212,52 +219,34 @@ class PostsController extends Controller
             $user = Auth::user();
         }
 
-        $post_query = Post::query();
-        $user_query = User::query();
-
+        $post = new Post;
         $keyword = preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['keyword']);
-
-        // 空検索の場合
         $posts = [];
 
-        if (!empty($request['category'])) {
-            if (!empty($keyword)) {
-                if ($request->do_name_search === '1') {
-                    $users = $user_query->where('name', 'LIKE', "%{$keyword}%")->get();
+        // カテゴリーだけ指定して、キーワードが未入力の場合の検索
+        if (!empty($request['category']) && empty($keyword)) {
+            $posts = Post::with(['comments'])->withCount('likes')->where('category', $request['category'])->orderBy('created_at', 'desc')->paginate(10);
+        }
 
-                    if ($users->count()) {
-                        $posts = Post::with(['comments'])->withCount('likes')->where('category', $request['category'])
-                            ->where(function ($query) use ($users) {
-                                foreach ($users as $user) {
-                                    $query->orWhere('user_id', $user->id);
-                                }
-                            })->orderBy('created_at', 'desc')->paginate(10);
-                    }
-                } else {
-                    $posts = Post::with(['comments'])->withCount('likes')->where('category', $request['category'])
-                        ->where(function ($query) use ($keyword) {
-                            $query
-                                ->where('title', 'LIKE', "%{$keyword}%")
-                                ->orWhere('body', 'LIKE', "%{$keyword}%");
-                        })->orderBy('created_at', 'desc')->paginate(10);
+        // カテゴリーとキーワードが指定されている場合
+        if (!empty($request['category']) && !empty($keyword)) {
+            // 投稿者名で検索する場合、出ないならば本文やタイトルの内容で検索する
+            if ($request->do_name_search === '1') {
+                $users = User::where('name', 'LIKE', "%{$keyword}%")->get();
+                if ($users->count()) {
+                    $posts = $post->getPostsByCategoryAndUser($request['category'], $users);
                 }
             } else {
-                $posts = $post_query->with(['comments'])->withCount('likes')->where('category', $request['category'])->orderBy('created_at', 'desc')->paginate(10);
+                $posts = $post->getPostsByCategoryAndKeyword($request['category'], $keyword);
             }
         } elseif (!empty($keyword)) {
             if ($request->do_name_search === '1') {
-                $users = $user_query->where('name', 'LIKE', "%{$keyword}%")->get();
-
+                $users = User::where('name', 'LIKE', "%{$keyword}%")->get();
                 if ($users->count()) {
-                    $posts = Post::with(['comments'])->withCount('likes')->where(function ($query) use ($users) {
-                        foreach ($users as $user) {
-                            $query->orWhere('user_id', $user->id);
-                        }
-                    })->orderBy('created_at', 'desc')->paginate(10);
+                    $posts = $post->getPostsByUser($users);
                 }
             } else {
-                $posts = $post_query->with(['comments'])->withCount('likes')->where('title', 'LIKE', "%{$keyword}%")
-                    ->orWhere('body', 'LIKE', "%{$keyword}%")->orderBy('created_at', 'desc')->paginate(10);
+                $posts = $post->getPostsByKeyword($keyword);
             }
         }
 
@@ -268,20 +257,22 @@ class PostsController extends Controller
             'page' => (int) $request->page,
             'keyword' => $keyword,
             'category' => $request['category'],
-            'like' => new Like,
             'do_name_search' => $request->do_name_search,
+            'like' => new Like,
             'categories' => Category::all(),
         ];
 
         return view('posts.find', $params);
     }
 
+    // イイネ処理
     public function ajaxlike(Request $request)
     {
         $user_id = Auth::user()->id;
-        $like = new Like;
         $post = Post::findOrFail($request->post_id);
+        $like = new Like;
 
+        // イイネがすでにされているならイイネを外す。されてないならイイネを追加する
         if ($like->like_exist($user_id, $post->id)) {
             $like = Like::where('user_id', $user_id)->where('post_id', $post->id)->delete();
         } else {
@@ -290,8 +281,6 @@ class PostsController extends Controller
             $like->save();
         }
 
-        $post_likes_count = $post->loadCount('likes')->likes_count;
-
-        return response()->json(['postLikesCount' => $post_likes_count]);
+        return response()->json(['postLikesCount' => $post->loadCount('likes')->likes_count]);
     }
 }

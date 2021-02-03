@@ -72,13 +72,13 @@ parse_str($url['query'], $params);
 
             @if (!empty($posts))
             <div class="d-flex justify-content-center mb-5">
-                {{ $posts->links() }}
+                {{ $posts->appends(['category'=>$category,'keyword'=>$keyword,'do_name_search'=>$do_name_search])->links() }}
             </div>
             @endif
             <div class="my-5">
                 <a class="btn btn-secondary" href="{{ route('top',['page'=>$page]) }}">戻る</a>
             </div>
-        </div>        
+        </div>
         <div class="col-md-3">
             <br><br><br>
             @include('components.ranking',['posts'=>$ranking_loved_posts])

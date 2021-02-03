@@ -89,11 +89,7 @@
             @yield('content')
         </div>
 
-        <footer class="footer bg-dark mt-5">
-            <div class="container">
-                <p class="text-muted text-center mt-1 pt-2">copyright 村田陸</p>
-            </div>
-        </footer>
+        @include('components.footer')
 
         <script src="https://code.jquery.com/jquery-3.5.1.min.js"
             integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous">
