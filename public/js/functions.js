@@ -60,7 +60,7 @@ function getPostHtml(value, paginate_data) {
 
     let a_img = '画像なし';
     if (value.img) {
-        a_img = `<a href="${value.img}"><img src="${value.img}" style = "width: 40px; height: 30px;"></a >`;
+        a_img = `<a href="${value.img}"><img src="${value.img}" style = "width: 40px; height: 30px;"></a>`;
     }
 
     let a_comment = 'コメント無し';

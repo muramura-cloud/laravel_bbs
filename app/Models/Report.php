@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Post;
+
 
 class Report extends Model
 {
@@ -28,6 +31,14 @@ class Report extends Model
                 $post_query->orWhere('id', $id);
             }
         })->orderBy('created_at', 'desc')->paginate(10, ['*'], 'page', $page);
+
+        if ($model instanceof Post) {
+            foreach ($contents as $content) {
+                if (!empty($content->img)) {
+                    $content['img'] = Storage::disk('s3')->url($content->img);
+                }
+            }
+        }
 
         return $contents;
     }
