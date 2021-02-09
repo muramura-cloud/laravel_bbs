@@ -1,5 +1,4 @@
-// sweetalert.jsのアラートメッセージで使用
-// functions.jsを使用
+// sweetalert.js functions.jsを使用
 let options = {
     text: '本当に削除しますか？',
     buttons: {

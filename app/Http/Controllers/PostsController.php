@@ -231,7 +231,6 @@ class PostsController extends Controller
 
         // カテゴリーとキーワードが指定されている場合
         if (!empty($request['category']) && !empty($keyword)) {
-            // 投稿者名で検索する場合、出ないならば本文やタイトルの内容で検索する
             if ($request->do_name_search === '1') {
                 $users = User::where('name', 'LIKE', "%{$keyword}%")->get();
                 if ($users->count()) {

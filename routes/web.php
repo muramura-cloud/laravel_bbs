@@ -7,18 +7,14 @@ Route::get('/', 'App\Http\Controllers\PostsController@index')->name('top');
 Route::get('/introduce', 'App\Http\Controllers\PostsController@introduce')->name('introduce');
 Route::get('/search', 'App\Http\Controllers\PostsController@search')->name('search');
 Route::post('/ajaxlike', 'App\Http\Controllers\PostsController@ajaxlike');
-
-// ユーザーページ
-Route::get('/user', 'App\Http\Controllers\UsersController@index')->name('user_top');
-Route::get('/user/read', 'App\Http\Controllers\UsersController@read');
-
-// 投稿
 Route::resource('posts', 'App\Http\Controllers\PostsController', ['only' => ['create', 'store', 'show', 'edit', 'update', 'destroy']]);
 
 // コメント
 Route::resource('comments', 'App\Http\Controllers\CommentsController', ['only' => ['store', 'edit', 'update', 'destroy']]);
 
-// 認証
+// ユーザーページと認証
+Route::get('/user', 'App\Http\Controllers\UsersController@index')->name('user_top');
+Route::get('/user/read', 'App\Http\Controllers\UsersController@read');
 Route::get('/logout', 'App\Http\Controllers\UsersController@logout');
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return redirect()->route('top');
