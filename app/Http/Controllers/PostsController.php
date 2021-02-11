@@ -17,18 +17,13 @@ use Illuminate\Support\Facades\Auth;
 class PostsController extends Controller
 {
     // トップページを表示
-    public function index()
+    public function index(Request $request)
     {
-        $user = null;
-        if (Auth::check()) {
-            $user = Auth::user();
-        }
-
         $posts = Post::with(['comments'])->withCount('likes')->orderBy('created_at', 'desc')->paginate(10);
 
         $params = [
             'posts' => $posts,
-            'user' => $user,
+            'user' => $request->user,
             'like' => new Like,
             'ranking_loved_posts' => Post::withCount('likes')->orderBy('likes_count', 'desc')->take(5)->get(),
             'categories' => Category::all(),
@@ -38,15 +33,10 @@ class PostsController extends Controller
     }
 
     // アプリ説明ページを表示
-    public function introduce()
+    public function introduce(Request $request)
     {
-        $user = null;
-        if (Auth::check()) {
-            $user = Auth::user();
-        }
-
         $params = [
-            'user' => $user,
+            'user' => $request->user,
             'ranking_loved_posts' => Post::withCount('likes')->orderBy('likes_count', 'desc')->take(5)->get(),
             'categories' => Category::all(),
         ];
@@ -57,12 +47,7 @@ class PostsController extends Controller
     // 投稿の新規作成ページを表示
     public function create(Request $request)
     {
-        $user = null;
-        if (Auth::check()) {
-            $user = Auth::user();
-        }
-
-        return view('posts.create', ['user' => $user, 'page' => $request->page]);
+        return view('posts.create', ['user' => $request->user, 'page' => $request->page]);
     }
 
     // 投稿保存
@@ -90,12 +75,9 @@ class PostsController extends Controller
     // 投稿詳細ページを表示
     public function show($post_id, Request $request)
     {
-        $user = null;
-        if (Auth::check()) {
-            $user = Auth::user();
-
-            // 既読処理 表示している投稿が自分が投稿したものだった場合、コメントを既読したことにする。
-            if (Post::findOrFail($post_id)->user_id === $user->id) {
+        // 既読処理 表示している投稿が自分が投稿したものだった場合、コメントを既読したことにする。
+        if (!empty($request->user)) {
+            if (Post::findOrFail($post_id)->user_id === $request->user->id) {
                 Read::where('post_id', $post_id)->delete();
             }
         }
@@ -103,7 +85,7 @@ class PostsController extends Controller
         $params = [
             'post' => Post::withCount('likes')->findOrFail($post_id),
             'page' => $request->page,
-            'user' => $user,
+            'user' => $request->user,
             'keyword' => $request->keyword,
             'category' => $request->category,
             'do_name_search' => $request->do_name_search,
@@ -117,13 +99,8 @@ class PostsController extends Controller
     // 投稿編集ページを表示
     public function edit($post_id, Request $request)
     {
-        $user = null;
-        if (Auth::check()) {
-            $user = Auth::user();
-        }
-
         $params = [
-            'user' => $user,
+            'user' => $request->user,
             'post' => Post::findOrFail($post_id),
             'page' => $request->page,
             'keyword' => $request->keyword,
@@ -215,11 +192,6 @@ class PostsController extends Controller
     // 投稿検索
     public function search(Request $request)
     {
-        $user = null;
-        if (Auth::check()) {
-            $user = Auth::user();
-        }
-
         $post = new Post;
         $keyword = preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['keyword']);
         $posts = [];
@@ -253,7 +225,7 @@ class PostsController extends Controller
         $params = [
             'posts' => $posts,
             'ranking_loved_posts' => Post::withCount('likes')->orderBy('likes_count', 'desc')->take(5)->get(),
-            'user' => $user,
+            'user' => $request->user,
             'page' => (int) $request->page,
             'keyword' => $keyword,
             'category' => $request['category'],
