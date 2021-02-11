@@ -43,27 +43,7 @@ parse_str($url['query'], $params);
                         <span class="ml-2 badge badge-info">{{$post->category ? $post->category : ''}}</span>
                         <span class="ml-2 badge">{{$post->user ? ' 投稿者 : ' . $post->user->name : ''}}</span>
                     </div>
-                    <div class="fav">
-                        @if($user && $like->like_exist($user->id,$post->id))
-                        <span class="favorite-marke">
-                            <a href="" class="js_like_toggle" data-user="{{$user}}" data-postid="{{ $post->id }}"><i
-                                    class="fas fa-heart  likesIcon loved"></i></a>
-                            <span class="likesCount">{{$post->likes_count}}</span>
-                        </span>
-                        @elseif($user && !$like->like_exist($user->id,$post->id))
-                        <span class="favorite-marke">
-                            <a href="" class="js_like_toggle" data-user="{{$user}}" data-postid="{{ $post->id }}"><i
-                                    class="fas fa-heart  likesIcon "></i></a>
-                            <span class="likesCount">{{$post->likes_count}}</span>
-                        </span>
-                        @else
-                        <span class="favorite-marke">
-                            <a href="" class="js_like_toggle" data-user="not_login" data-postid="{{ $post->id }}"><i
-                                    class="fas fa-heart  likesIcon "></i></a>
-                            <span class="likesCount">{{$post->likes_count}}</span>
-                        </span>
-                        @endif
-                    </div>
+                    @include('components.like',['post' => $post, 'user' => $user, 'like' => $like])
                 </div>
             </div>
             @empty

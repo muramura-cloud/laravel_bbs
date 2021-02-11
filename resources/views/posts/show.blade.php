@@ -31,26 +31,8 @@ $params['from'] = $from;
         <p class="mb-2 badge">カテゴリー : {{$post->category ? $post->category:'無し'}}</p>
         @endif
 
-        <div class="fav mb-5">
-            @if($user && $like->like_exist($user->id,$post->id))
-            <span class="favorite-marke">
-                <a href="" class="js_like_toggle" data-user="{{$user}}" data-postid="{{ $post->id }}"><strong
-                        class="badge">イイね</strong><i class="fas fa-heart  likesIcon loved"></i></a>
-                <span class="likesCount">{{$post->likes_count}}</span>
-            </span>
-            @elseif($user && !$like->like_exist($user->id,$post->id))
-            <span class="favorite-marke">
-                <a href="" class="js_like_toggle" data-user="{{$user}}" data-postid="{{ $post->id }}"><strong
-                        class="badge">イイね</strong><i class="fas fa-heart  likesIcon "></i></a>
-                <span class="likesCount">{{$post->likes_count}}</span>
-            </span>
-            @else
-            <span class="favorite-marke">
-                <a href="" class="js_like_toggle" data-user="not_login" data-postid="{{ $post->id }}"><strong
-                        class="badge">イイね</strong><i class="fas fa-heart  likesIcon "></i></a>
-                <span class="likesCount">{{$post->likes_count}}</span>
-            </span>
-            @endif
+        <div class="mb-5">
+            @include('components.like',['post' => $post, 'user' => $user, 'like' => $like])
         </div>
 
         <div class="mb-4 text-left">
