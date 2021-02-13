@@ -169,3 +169,11 @@ function getUrlQueries() {
 
     return queries;
 }
+
+// ajax通信でエラー内容をコンソールに出力
+function outputAjaxError(jqXHR, textStatus, errorThrown) {
+    console.log("ajax通信に失敗しました");
+    console.log("jqXHR          : " + jqXHR.status); // HTTPステータスが取得
+    console.log("textStatus     : " + textStatus);    // タイムアウト、パースエラー
+    console.log("errorThrown    : " + errorThrown.message); // 例外情報
+}

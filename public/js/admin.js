@@ -106,10 +106,7 @@ function setUpPaginationBtns(options) {
                     $('#posts_tbody').append('<p class="text-center mt-5 search-null">検索に一致する投稿は存在しません。</p>');
                 }
             }).fail(function (jqXHR, textStatus, errorThrown) {
-                console.log("ajax通信に失敗しました");
-                console.log("jqXHR          : " + jqXHR.status); // HTTPステータスが取得
-                console.log("textStatus     : " + textStatus);    // タイムアウト、パースエラー
-                console.log("errorThrown    : " + errorThrown.message); // 例外情報
+                outputAjaxError(jqXHR, textStatus, errorThrown);
             });
         }, false);
     }
@@ -119,6 +116,10 @@ setUpPaginationBtns(options);
 // 単一削除ボタン
 function setUpSingleDeleteBtn(options) {
     let admin_delete_btns = document.getElementsByName("admin_delete_btn");
+
+    // jQueryならこんな感じで取得できて、thisを使えば簡単にアクセスできるよ。
+    let admin_delete_btn = $('button[name="admin_delete_btn"]');
+    console.log(admin_delete_btn);
 
     for (var i = 0; i < admin_delete_btns.length; i++) {
         admin_delete_btns[i].addEventListener("click", function (e) {
@@ -187,10 +188,7 @@ function setUpSingleDeleteBtn(options) {
                             $('#posts_tbody').append('<p class="text-center mt-5 search-null">検索に一致する投稿は存在しません。</p>');
                         }
                     }).fail(function (jqXHR, textStatus, errorThrown) {
-                        console.log("ajax通信に失敗しました");
-                        console.log("jqXHR          : " + jqXHR.status); // HTTPステータスが取得
-                        console.log("textStatus     : " + textStatus);    // タイムアウト、パースエラー
-                        console.log("errorThrown    : " + errorThrown.message); // 例外情報
+                        outputAjaxError(jqXHR, textStatus, errorThrown);
                     });
                 }
             });
@@ -281,10 +279,7 @@ function setUpMultDeleteBtn(options) {
                             $('#posts_tbody').append('<p class="text-center mt-5 search-null">検索に一致する投稿は存在しません。</p>');
                         }
                     }).fail(function (jqXHR, textStatus, errorThrown) {
-                        console.log("ajax通信に失敗しました");
-                        console.log("jqXHR          : " + jqXHR.status); // HTTPステータスが取得
-                        console.log("textStatus     : " + textStatus);    // タイムアウト、パースエラー
-                        console.log("errorThrown    : " + errorThrown.message); // 例外情報
+                        outputAjaxError(jqXHR, textStatus, errorThrown);
                     });
                 }
             });
@@ -328,10 +323,7 @@ $('#admin_search_btn').on('click', function () {
             $('#posts_tbody').append('<p class="text-center mt-5 search-null">投稿が見つかりません</p>');
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
-        console.log("ajax通信に失敗しました");
-        console.log("jqXHR          : " + jqXHR.status); // HTTPステータスが取得
-        console.log("textStatus     : " + textStatus);    // タイムアウト、パースエラー
-        console.log("errorThrown    : " + errorThrown.message); // 例外情報
+        outputAjaxError(jqXHR, textStatus, errorThrown);
     });
 });
 
@@ -367,10 +359,7 @@ $('#reported_posts_btn').on('click', function () {
             $('#posts_tbody').append('<p class="text-center mt-5 search-null">投稿が見つかりません</p>');
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
-        console.log("ajax通信に失敗しました");
-        console.log("jqXHR          : " + jqXHR.status); // HTTPステータスが取得
-        console.log("textStatus     : " + textStatus);    // タイムアウト、パースエラー
-        console.log("errorThrown    : " + errorThrown.message); // 例外情報
+        outputAjaxError(jqXHR, textStatus, errorThrown);
     });
 })
 
@@ -408,10 +397,7 @@ $('#comment_search_btn').on('click', function () {
             $('#posts_tbody').append('<p class="text-center mt-5 search-null">コメントが見つかりません</p>');
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
-        console.log("ajax通信に失敗しました");
-        console.log("jqXHR          : " + jqXHR.status); // HTTPステータスが取得
-        console.log("textStatus     : " + textStatus);    // タイムアウト、パースエラー
-        console.log("errorThrown    : " + errorThrown.message); // 例外情報
+        outputAjaxError(jqXHR, textStatus, errorThrown);
     });
 });
 
@@ -447,9 +433,6 @@ $('#reported_comments_btn').on('click', function () {
             $('#posts_tbody').append('<p class="text-center mt-5 search-null">投稿が見つかりません</p>');
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
-        console.log("ajax通信に失敗しました");
-        console.log("jqXHR          : " + jqXHR.status); // HTTPステータスが取得
-        console.log("textStatus     : " + textStatus);    // タイムアウト、パースエラー
-        console.log("errorThrown    : " + errorThrown.message); // 例外情報
+        outputAjaxError(jqXHR, textStatus, errorThrown);
     });
 })
