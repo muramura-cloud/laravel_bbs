@@ -17,11 +17,8 @@ class Helper
         echo '</pre>';
     }
 
-    public static function getQuery()
+    public static function mbTrim($str)
     {
-        $url = parse_url(request()->fullUrl());
-        parse_str($url['query'], $params);
-
-        return $params;
+        return preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $str);
     }
 }

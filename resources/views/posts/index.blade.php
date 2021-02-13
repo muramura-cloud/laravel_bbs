@@ -10,11 +10,10 @@
             </div>
 
             @foreach ($posts as $post)
-
             @include('components.post',['post' => $post, 'user' => $user, 'like' => $like, 'page' =>
             $posts->currentPage()])
-            
             @endforeach
+
             <div class="d-flex justify-content-center mb-5">
                 {{ $posts->links() }}
             </div>

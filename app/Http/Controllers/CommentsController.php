@@ -49,17 +49,12 @@ class CommentsController extends Controller
     // コメント編集ページを表示
     public function edit($comment_id, Request $request)
     {
-        $user = null;
-        if (Auth::check()) {
-            $user = Auth::user();
-        }
-
         $comment = Comment::findOrFail($comment_id);
 
         $params = [
             'comment' => $comment,
             'post' => $comment->getPost(),
-            'user' => $user,
+            'user' => $request->user,
             'page' => $request->page,
             'keyword' => $request->keyword,
             'category' => $request->category,

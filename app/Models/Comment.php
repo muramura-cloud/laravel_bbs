@@ -16,11 +16,9 @@ class Comment extends Model
 
     public function post()
     {
-        // 関連づけられている主テーブルの理コードを取り出す
         return $this->belongsTo('App\Models\Post');
     }
 
-    // 紐づけられている主テーブルを取得
     public function getPost()
     {
         return $this->post;
@@ -29,5 +27,16 @@ class Comment extends Model
     public function user()
     {
         return $this->belongsTo('App\Models\User');
+    }
+
+    public function getCommentsByKeyword($keywords, $page)
+    {
+        $comments = $this::where(function ($query) use ($keywords) {
+            foreach ($keywords as $col_name => $value) {
+                $query->where($col_name, 'LIKE', "%{$value}%");
+            }
+        })->orderBy('created_at', 'desc')->paginate($this->per_page, ['*'], 'page', (int) $page);
+
+        return $comments;
     }
 }

@@ -121,8 +121,8 @@ class AdminController extends Controller
         $posts = $this->getSearchedPosts($request);
 
         $keywords = [
-            'title' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['title']),
-            'body' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['body']),
+            'title' => Helper::mbTrim($request['title']),
+            'body' => Helper::mbTrim($request['body']),
         ];
 
         // 投稿に紐づくコメント一覧からトップページ(投稿一覧)を表示する場合
@@ -154,11 +154,11 @@ class AdminController extends Controller
     private function getSearchedPosts($request)
     {
         $keywords = [
-            'title' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['title']),
-            'body' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['body']),
+            'title' => Helper::mbTrim($request['title']),
+            'body' => Helper::mbTrim($request['body']),
         ];
 
-        $posts = Post::where(function ($post_query) use ($keywords) {
+        $posts = Post::with(['comments'])->where(function ($post_query) use ($keywords) {
             foreach ($keywords as $col_name => $value) {
                 $post_query->where($col_name, 'LIKE', "%{$value}%");
             }
@@ -185,14 +185,11 @@ class AdminController extends Controller
     private function getSearchedComments($request)
     {
         $keywords = [
-            'body' => preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['body']),
+            'body' => Helper::mbTrim($request['body']),
         ];
 
-        $comments = Comment::where(function ($post_query) use ($keywords) {
-            foreach ($keywords as $col_name => $value) {
-                $post_query->where($col_name, 'LIKE', "%{$value}%");
-            }
-        })->orderBy('created_at', 'desc')->paginate($this->per_page, ['*'], 'page', (int) $request['page']);
+        $comment = new Comment;
+        $comments = $comment->getCommentsByKeyword($keywords, $request['page']);
 
         // jsにおくるデータにページ遷移に必要なデータとトークンを加える。
         foreach ($comments as $comment) {

@@ -50,6 +50,11 @@ class Post extends Model
         }
     }
 
+    public function getPostsByCategory($category)
+    {
+        return  Post::with(['comments'])->withCount('likes')->where('category', $category)->orderBy('created_at', 'desc')->paginate(10);
+    }
+
     public function getPostsByCategoryAndKeyword($category, $keyword)
     {
         $posts = $this::with(['comments'])->withCount('likes')->where('category', $category)

@@ -19,10 +19,8 @@ class PostsController extends Controller
     // トップページを表示
     public function index(Request $request)
     {
-        $posts = Post::with(['comments'])->withCount('likes')->orderBy('created_at', 'desc')->paginate(10);
-
         $params = [
-            'posts' => $posts,
+            'posts' => Post::with(['comments'])->withCount('likes')->orderBy('created_at', 'desc')->paginate(10),
             'user' => $request->user,
             'like' => new Like,
             'ranking_loved_posts' => Post::withCount('likes')->orderBy('likes_count', 'desc')->take(5)->get(),
@@ -193,30 +191,25 @@ class PostsController extends Controller
     public function search(Request $request)
     {
         $post = new Post;
-        $keyword = preg_replace('/\A[\x00\s]++|[\x00\s]++\z/u', '', $request['keyword']);
+        $keyword = Helper::mbTrim($request['keyword']);
+        $users = User::where('name', 'LIKE', "%{$keyword}%")->get();
         $posts = [];
 
         // カテゴリーだけ指定して、キーワードが未入力の場合の検索
         if (!empty($request['category']) && empty($keyword)) {
-            $posts = Post::with(['comments'])->withCount('likes')->where('category', $request['category'])->orderBy('created_at', 'desc')->paginate(10);
+            $posts = $post->getPostsByCategory($request['category']);
         }
 
         // カテゴリーとキーワードが指定されている場合
         if (!empty($request['category']) && !empty($keyword)) {
-            if ($request->do_name_search === '1') {
-                $users = User::where('name', 'LIKE', "%{$keyword}%")->get();
-                if ($users->count()) {
-                    $posts = $post->getPostsByCategoryAndUser($request['category'], $users);
-                }
+            if ($request->do_name_search === '1' && $users->count()) {
+                $posts = $post->getPostsByCategoryAndUser($request['category'], $users);
             } else {
                 $posts = $post->getPostsByCategoryAndKeyword($request['category'], $keyword);
             }
         } elseif (!empty($keyword)) {
-            if ($request->do_name_search === '1') {
-                $users = User::where('name', 'LIKE', "%{$keyword}%")->get();
-                if ($users->count()) {
-                    $posts = $post->getPostsByUser($users);
-                }
+            if ($request->do_name_search === '1' && $users->count()) {
+                $posts = $post->getPostsByUser($users);
             } else {
                 $posts = $post->getPostsByKeyword($keyword);
             }
