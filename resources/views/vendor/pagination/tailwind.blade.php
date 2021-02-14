@@ -94,7 +94,7 @@
                 aria-label="{{ __('Go to page :page', ['page' => $page]) }}">
                 {{ $page }}
                 </a> --}}
-                <li class="page-item"><a name="pagination_btn" class="page-link" href="{{$url}}">{{$page}}</a></li>
+                <li class="page-item"><a name="pagination_btn" class="page-link pagination_btn" href="{{$url}}">{{$page}}</a></li>
                 @endif
                 @endforeach
                 @endif

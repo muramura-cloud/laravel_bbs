@@ -89,7 +89,7 @@ function getPostHtml(value, paginate_data) {
             <form name="admin_delete_form" style="display: inline-block;" method="post" action="/admin_delete">
                 <input type="hidden" name="_token" value="${value._token}">
                 <input type="hidden" name="post_id" value="${value.id}">
-                <button name="admin_delete_btn" class="btn btn-danger">削除</button>
+                <button name="admin_delete_btn" class="btn btn-danger admin_delete_btn">削除</button>
             </form>
         </td>
     </tr>
@@ -116,7 +116,7 @@ function getCommentHtml(value) {
             <form name="admin_delete_form" style="display: inline-block;" method="post" action="/admin_delete">
                 <input type="hidden" name="_token" value="${value._token}">
                 <input type="hidden" name="post_id" value="${value.id}">
-                <button name="admin_delete_btn" class="btn btn-danger">削除</button>
+                <button name="admin_delete_btn" class="btn btn-danger admin_delete_btn">削除</button>
             </form>
         </td>
     </tr>
@@ -142,7 +142,7 @@ function getPaginationBtns(paginate_data) {
         if (paginate_data.links[index].label === paginate_data.current_page) {
             pagination_btns += `<li class="page-item active" aria-current="page"><span class="page-link">${paginate_data.links[index].label}</span></li>`;
         } else {
-            pagination_btns += `<li class="page-item"><a name="pagination_btn" class="page-link" href="${paginate_data.links[index].url}">${paginate_data.links[index].label}</a></li>`;
+            pagination_btns += `<li class="page-item"><a name="pagination_btn" class="page-link pagination_btn" href="${paginate_data.links[index].url}">${paginate_data.links[index].label}</a></li>`;
         }
     }
     pagination_btns += '</ul></nav>';

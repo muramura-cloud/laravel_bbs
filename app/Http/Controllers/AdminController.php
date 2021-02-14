@@ -189,7 +189,7 @@ class AdminController extends Controller
         ];
 
         $comment = new Comment;
-        $comments = $comment->getCommentsByKeyword($keywords, $request['page']);
+        $comments = $comment->getCommentsByKeyword($keywords, (int) $request['page']);
 
         // jsにおくるデータにページ遷移に必要なデータとトークンを加える。
         foreach ($comments as $comment) {

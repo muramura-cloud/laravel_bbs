@@ -90,7 +90,7 @@
                         @csrf
 
                         <input type="hidden" name="post_id" value="{{$post->id}}">
-                        <button name="admin_delete_btn" class="btn btn-danger">削除</button>
+                        <button name="admin_delete_btn" class="btn btn-danger admin_delete_btn">削除</button>
                     </form>
                 </td>
             </tr>

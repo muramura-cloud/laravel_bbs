@@ -35,7 +35,7 @@ class Comment extends Model
             foreach ($keywords as $col_name => $value) {
                 $query->where($col_name, 'LIKE', "%{$value}%");
             }
-        })->orderBy('created_at', 'desc')->paginate($this->per_page, ['*'], 'page', (int) $page);
+        })->orderBy('created_at', 'desc')->paginate(10, ['*'], 'page', (int) $page);
 
         return $comments;
     }

@@ -9,6 +9,8 @@ let options = {
 $(function () {
     let like = $('.js_like_toggle');
 
+    console.log(like);
+
     like.on('click', function (e) {
         e.preventDefault();
 

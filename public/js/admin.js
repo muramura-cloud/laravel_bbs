@@ -34,167 +34,152 @@ setUpMultCheckBtn();
 
 //ページネーションボタン
 function setUpPaginationBtns(options) {
-    let pagination_btns = document.getElementsByName("pagination_btn");
+    $('.pagination_btn').click(function (e) {
+        e.preventDefault();
 
-    for (var i = 0; i < pagination_btns.length; i++) {
-        pagination_btns[i].addEventListener("click", function (e) {
-            e.preventDefault();
+        $('#posts_tbody').empty();
+        $('#pagination_btns').empty();
 
-            $('#posts_tbody').empty();
-            $('#pagination_btns').empty();
+        // デフォルトは投稿表示
+        let link = $(this).attr('href');
+        let show_content = 'post';
+        let url = '/admin/search/';
+        let data = {
+            'page': link.slice(link.indexOf('?page=') + 6),
+            'title': $('#keyword_title').val(),
+            'body': $('#keyword_body').val(),
+            '_token': $('meta[name="csrf-token"]').attr('content'),
+        };
 
-            // デフォルトは投稿表示
-            let link = $(this).attr('href');
-            let show_content = 'post';
-            let url = '/admin/search/';
-            let data = {
+        // 投稿に紐づくコメント表示の場合
+        if (location.pathname.indexOf('admin_comment') > -1) {
+            show_content = 'comment';
+            url = '/admin_comment/';
+            data = {
                 'page': link.slice(link.indexOf('?page=') + 6),
-                'title': $('#keyword_title').val(),
-                'body': $('#keyword_body').val(),
+                'post_id': location.pathname.replace('/admin_comment/', ''),
+                'ajax': 'true',
                 '_token': $('meta[name="csrf-token"]').attr('content'),
             };
-
-            // 投稿に紐づくコメント表示の場合
-            if (location.pathname.indexOf('admin_comment') > -1) {
-                show_content = 'comment';
-                url = '/admin_comment/';
+            // コメント検索の場合
+            if (location.pathname.indexOf('admin_comment_list') > -1) {
+                url = '/admin/comment_search/';
                 data = {
                     'page': link.slice(link.indexOf('?page=') + 6),
-                    'post_id': location.pathname.replace('/admin_comment/', ''),
-                    'ajax': 'true',
+                    'body': $('#keyword_body').val(),
                     '_token': $('meta[name="csrf-token"]').attr('content'),
                 };
-                // コメント検索の場合
-                if (location.pathname.indexOf('admin_comment_list') > -1) {
-                    url = '/admin/comment_search/';
-                    data = {
-                        'page': link.slice(link.indexOf('?page=') + 6),
-                        'body': $('#keyword_body').val(),
-                        '_token': $('meta[name="csrf-token"]').attr('content'),
-                    };
-                }
             }
+        }
 
-            $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                type: 'GET',
-                url: url,
-                data: data,
-                dataType: 'json',
-            }).done(function (data) {
-                let html;
+        $.ajax({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            type: 'GET',
+            url: url,
+            data: data,
+            dataType: 'json',
+        }).done(function (data) {
+            let html;
 
-                $.each(data.data, function (index, value) {
-                    if (show_content === 'post') {
-                        html += getPostHtml(value, data);
-                    } else if (show_content === 'comment') {
-                        html += getCommentHtml(value);
-                    }
-                });
-
-                $('#posts_tbody').append(html);
-                $('#pagination_btns').append(getPaginationBtns(data));
-                $('#current_page').attr('value', data.current_page);
-
-                setUpSingleDeleteBtn(options);
-                setUpMultDeleteBtn(options);
-                setUpPaginationBtns(options);
-
-                if (data.data.length === 0) {
-                    $('#posts_tbody').append('<p class="text-center mt-5 search-null">検索に一致する投稿は存在しません。</p>');
+            $.each(data.data, function (index, value) {
+                if (show_content === 'post') {
+                    html += getPostHtml(value, data);
+                } else if (show_content === 'comment') {
+                    html += getCommentHtml(value);
                 }
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                outputAjaxError(jqXHR, textStatus, errorThrown);
             });
-        }, false);
-    }
+
+            $('#posts_tbody').append(html);
+            $('#pagination_btns').append(getPaginationBtns(data));
+            $('#current_page').attr('value', data.current_page);
+
+            setUpSingleDeleteBtn(options);
+            setUpMultDeleteBtn(options);
+            setUpPaginationBtns(options);
+
+            if (data.data.length === 0) {
+                $('#posts_tbody').append('<p class="text-center mt-5 search-null">検索に一致する投稿は存在しません。</p>');
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            outputAjaxError(jqXHR, textStatus, errorThrown);
+        });
+    });
 }
 setUpPaginationBtns(options);
 
 // 単一削除ボタン
 function setUpSingleDeleteBtn(options) {
-    let admin_delete_btns = document.getElementsByName("admin_delete_btn");
+    $('.admin_delete_btn').click(function (e) {
+        e.preventDefault();
 
-    // jQueryならこんな感じで取得できて、thisを使えば簡単にアクセスできるよ。
-    let admin_delete_btn = $('button[name="admin_delete_btn"]');
-    console.log(admin_delete_btn);
+        // デフォルトは投稿削除
+        let delete_content = 'post';
+        let url = '/admin_delete';
+        let data = {
+            'page': document.getElementById('current_page').value,
+            'title': $('#keyword_title').val(),
+            'body': $('#keyword_body').val(),
+            'post_id': $(this).prev('input').val(),
+            '_token': $('meta[name="csrf-token"]').attr('content'),
+        };
 
-    for (var i = 0; i < admin_delete_btns.length; i++) {
-        admin_delete_btns[i].addEventListener("click", function (e) {
-            e.preventDefault();
-
-            // デフォルトは投稿削除
-            let delete_content = 'post';
-            let url = '/admin_delete';
-            let data = {
+        // コメント削除の場合
+        if (location.pathname.indexOf('admin_comment') > -1) {
+            delete_content = 'comment';
+            url = '/admin_comment_delete';
+            data = {
                 'page': document.getElementById('current_page').value,
-                'title': $('#keyword_title').val(),
-                'body': $('#keyword_body').val(),
-                'post_id': $(this).prev('input').val(),
+                'comment_id': $(this).prev('input').val(),
+                'post_id': location.pathname.replace('/admin_comment/', ''),
                 '_token': $('meta[name="csrf-token"]').attr('content'),
             };
 
-            // コメント削除の場合
-            if (location.pathname.indexOf('admin_comment') > -1) {
-                delete_content = 'comment';
-                url = '/admin_comment_delete';
+            if (location.pathname.indexOf('admin_comment_list') > -1) {
                 data = {
+                    'show_comment_list': true,
+                    'body': $('#keyword_body').val(),
                     'page': document.getElementById('current_page').value,
                     'comment_id': $(this).prev('input').val(),
-                    'post_id': location.pathname.replace('/admin_comment/', ''),
                     '_token': $('meta[name="csrf-token"]').attr('content'),
                 };
-
-                if (location.pathname.indexOf('admin_comment_list') > -1) {
-                    data = {
-                        'show_comment_list': true,
-                        'body': $('#keyword_body').val(),
-                        'page': document.getElementById('current_page').value,
-                        'comment_id': $(this).prev('input').val(),
-                        '_token': $('meta[name="csrf-token"]').attr('content'),
-                    };
-                }
             }
+        }
 
-            swal(options).then(function (value) {
-                if (value) {
-                    $('#posts_tbody').empty();
+        swal(options).then(function (value) {
+            if (value) {
+                $('#posts_tbody').empty();
 
-                    $.ajax({
-                        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                        type: 'POST',
-                        url: url,
-                        data: data,
-                        dataType: 'json',
-                    }).done(function (data) {
-                        let html;
+                $.ajax({
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                    type: 'POST',
+                    url: url,
+                    data: data,
+                    dataType: 'json',
+                }).done(function (data) {
+                    let html;
 
-                        $.each(data.data, function (index, value) {
-                            if (delete_content === 'post') {
-                                html += getPostHtml(value, data);
-                            } else if (delete_content === 'comment') {
-                                html += getCommentHtml(value);
-                            }
-                        });
-
-                        $('#posts_tbody').append(html);
-
-                        setUpSingleDeleteBtn(options);
-                        setUpMultDeleteBtn(options);
-
-                        if (data.data.length === 0) {
-                            $('#posts_tbody').append('<p class="text-center mt-5 search-null">検索に一致する投稿は存在しません。</p>');
+                    $.each(data.data, function (index, value) {
+                        if (delete_content === 'post') {
+                            html += getPostHtml(value, data);
+                        } else if (delete_content === 'comment') {
+                            html += getCommentHtml(value);
                         }
-                    }).fail(function (jqXHR, textStatus, errorThrown) {
-                        outputAjaxError(jqXHR, textStatus, errorThrown);
                     });
-                }
-            });
 
-        }, false);
-    }
+                    $('#posts_tbody').append(html);
+
+                    setUpSingleDeleteBtn(options);
+                    setUpMultDeleteBtn(options);
+
+                    if (data.data.length === 0) {
+                        $('#posts_tbody').append('<p class="text-center mt-5 search-null">検索に一致する投稿は存在しません。</p>');
+                    }
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    outputAjaxError(jqXHR, textStatus, errorThrown);
+                });
+            }
+        });
+    });
 }
 setUpSingleDeleteBtn(options);
 
