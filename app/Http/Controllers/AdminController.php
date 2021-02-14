@@ -26,9 +26,7 @@ class AdminController extends Controller
     // コメント一覧ページを表示
     public function comment()
     {
-        $comments = Comment::paginate(10);
-
-        return view('admin.comment', ['comments' => $comments]);
+        return view('admin.comment', ['comments' => Comment::orderBy('created_at', 'desc')->paginate(10)]);
     }
 
     // 「コメント一覧へ」ボタンを押したとき,投稿に紐づくコメントを表示
