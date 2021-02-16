@@ -79,27 +79,13 @@ function setUpPaginationBtns(options) {
             data: data,
             dataType: 'json',
         }).done(function (data) {
-            let html;
-
-            $.each(data.data, function (index, value) {
-                if (show_content === 'post') {
-                    html += getPostHtml(value, data);
-                } else if (show_content === 'comment') {
-                    html += getCommentHtml(value);
-                }
-            });
-
-            $('#posts_tbody').append(html);
+            $('#posts_tbody').append(getHtml(show_content, data));
             $('#pagination_btns').append(getPaginationBtns(data));
             $('#current_page').attr('value', data.current_page);
 
             setUpSingleDeleteBtn(options);
             setUpMultDeleteBtn(options);
             setUpPaginationBtns(options);
-
-            if (data.data.length === 0) {
-                $('#posts_tbody').append('<p class="text-center mt-5 search-null">検索に一致する投稿は存在しません。</p>');
-            }
         }).fail(function (jqXHR, textStatus, errorThrown) {
             outputAjaxError(jqXHR, textStatus, errorThrown);
         });
@@ -156,24 +142,9 @@ function setUpSingleDeleteBtn(options) {
                     data: data,
                     dataType: 'json',
                 }).done(function (data) {
-                    let html;
-
-                    $.each(data.data, function (index, value) {
-                        if (delete_content === 'post') {
-                            html += getPostHtml(value, data);
-                        } else if (delete_content === 'comment') {
-                            html += getCommentHtml(value);
-                        }
-                    });
-
-                    $('#posts_tbody').append(html);
-
+                    $('#posts_tbody').append(getHtml(delete_content, data));
                     setUpSingleDeleteBtn(options);
                     setUpMultDeleteBtn(options);
-
-                    if (data.data.length === 0) {
-                        $('#posts_tbody').append('<p class="text-center mt-5 search-null">検索に一致する投稿は存在しません。</p>');
-                    }
                 }).fail(function (jqXHR, textStatus, errorThrown) {
                     outputAjaxError(jqXHR, textStatus, errorThrown);
                 });
@@ -189,13 +160,7 @@ function setUpMultDeleteBtn(options) {
         e.preventDefault();
 
         let delete_checkboxes = document.getElementsByName('delete_checkbox');
-
-        let delete_ids = [];
-        for (let i = 0; i < delete_checkboxes.length; i++) {
-            if (delete_checkboxes[i].checked) {
-                delete_ids.push(delete_checkboxes[i].value);
-            }
-        }
+        let delete_ids = getCheckBoxValues(delete_checkboxes);
 
         if (delete_ids.length === 0) {
             swal('削除したいコンテンツにチェックを入れてください。');
@@ -245,24 +210,9 @@ function setUpMultDeleteBtn(options) {
                         data: data,
                         dataType: 'json',
                     }).done(function (data) {
-                        let html;
-
-                        $.each(data.data, function (index, value) {
-                            if (delete_content === 'post') {
-                                html += getPostHtml(value, data);
-                            } else if (delete_content === 'comment') {
-                                html += getCommentHtml(value);
-                            }
-                        });
-
-                        $('#posts_tbody').append(html);
-
+                        $('#posts_tbody').append(getHtml(delete_content, data));
                         setUpSingleDeleteBtn(options);
                         setUpMultDeleteBtn(options);
-
-                        if (data.data.length === 0) {
-                            $('#posts_tbody').append('<p class="text-center mt-5 search-null">検索に一致する投稿は存在しません。</p>');
-                        }
                     }).fail(function (jqXHR, textStatus, errorThrown) {
                         outputAjaxError(jqXHR, textStatus, errorThrown);
                     });
@@ -279,9 +229,7 @@ $('#admin_search_btn').on('click', function () {
     $('#pagination_btns').empty();
 
     $.ajax({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
         type: 'GET',
         url: '/admin/search/',
         data: {
@@ -291,22 +239,12 @@ $('#admin_search_btn').on('click', function () {
         },
         dataType: 'json',
     }).done(function (data) {
-        let html;
-
-        $.each(data.data, function (index, value) {
-            html += getPostHtml(value, data);
-        });
-
-        $('#posts_tbody').append(html);
+        $('#posts_tbody').append(getHtml('post', data));
         $('#pagination_btns').append(getPaginationBtns(data));
 
         setUpSingleDeleteBtn(options);
         setUpMultDeleteBtn(options);
         setUpPaginationBtns(options);
-
-        if (data.data.length === 0) {
-            $('#posts_tbody').append('<p class="text-center mt-5 search-null">投稿が見つかりません</p>');
-        }
     }).fail(function (jqXHR, textStatus, errorThrown) {
         outputAjaxError(jqXHR, textStatus, errorThrown);
     });
@@ -327,22 +265,12 @@ $('#reported_posts_btn').on('click', function () {
         },
         dataType: 'json',
     }).done(function (data) {
-        let html;
-
-        $.each(data.data, function (index, value) {
-            html += getPostHtml(value, data);
-        });
-
-        $('#posts_tbody').append(html);
+        $('#posts_tbody').append(getHtml('post', data));
         $('#pagination_btns').append(getPaginationBtns(data));
 
         setUpSingleDeleteBtn(options);
         setUpMultDeleteBtn(options);
         setUpPaginationBtns(options);
-
-        if (data.data.length === 0) {
-            $('#posts_tbody').append('<p class="text-center mt-5 search-null">投稿が見つかりません</p>');
-        }
     }).fail(function (jqXHR, textStatus, errorThrown) {
         outputAjaxError(jqXHR, textStatus, errorThrown);
     });
@@ -354,9 +282,7 @@ $('#comment_search_btn').on('click', function () {
     $('#pagination_btns').empty();
 
     $.ajax({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
         type: 'GET',
         url: '/admin/comment_search/',
         data: {
@@ -365,22 +291,12 @@ $('#comment_search_btn').on('click', function () {
         },
         dataType: 'json',
     }).done(function (data) {
-        let html;
-
-        $.each(data.data, function (index, value) {
-            html += getCommentHtml(value);
-        });
-
-        $('#posts_tbody').append(html);
+        $('#posts_tbody').append(getHtml('comment', data));
         $('#pagination_btns').append(getPaginationBtns(data));
 
         setUpSingleDeleteBtn(options);
         setUpMultDeleteBtn(options);
         setUpPaginationBtns(options);
-
-        if (data.data.length === 0) {
-            $('#posts_tbody').append('<p class="text-center mt-5 search-null">コメントが見つかりません</p>');
-        }
     }).fail(function (jqXHR, textStatus, errorThrown) {
         outputAjaxError(jqXHR, textStatus, errorThrown);
     });
@@ -401,22 +317,12 @@ $('#reported_comments_btn').on('click', function () {
         },
         dataType: 'json',
     }).done(function (data) {
-        let html;
-
-        $.each(data.data, function (index, value) {
-            html += getCommentHtml(value);
-        });
-
-        $('#posts_tbody').append(html);
+        $('#posts_tbody').append(getHtml('comment', data));
         $('#pagination_btns').append(getPaginationBtns(data));
 
         setUpSingleDeleteBtn(options);
         setUpMultDeleteBtn(options);
         setUpPaginationBtns(options);
-
-        if (data.data.length === 0) {
-            $('#posts_tbody').append('<p class="text-center mt-5 search-null">投稿が見つかりません</p>');
-        }
     }).fail(function (jqXHR, textStatus, errorThrown) {
         outputAjaxError(jqXHR, textStatus, errorThrown);
     });

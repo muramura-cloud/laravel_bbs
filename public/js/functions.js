@@ -1,3 +1,5 @@
+// jQueryに依存する
+
 // リンクにクエリを付け足す。
 function addUrlParam(path, key, value, save) {
     if (!path || !key || !value) return '';
@@ -125,6 +127,25 @@ function getCommentHtml(value) {
     return html;
 }
 
+// 表示するhtml（投稿かコメント）を取得
+function getHtml(content, paginate_data) {
+    let html;
+
+    $.each(paginate_data.data, function (index, value) {
+        if (content === 'post') {
+            html += getPostHtml(value, paginate_data);
+        } else if (content === 'comment') {
+            html += getCommentHtml(value);
+        }
+    });
+
+    if (paginate_data.data.length === 0) {
+        return '<p class="text-center mt-5 search-null w-100">検索に一致するレコードは存在しません。</p>';
+    }
+
+    return html;
+}
+
 //ページネーションボタン
 function getPaginationBtns(paginate_data) {
     let pagination_btns = '';
@@ -176,4 +197,17 @@ function outputAjaxError(jqXHR, textStatus, errorThrown) {
     console.log("jqXHR          : " + jqXHR.status); // HTTPステータスが取得
     console.log("textStatus     : " + textStatus);    // タイムアウト、パースエラー
     console.log("errorThrown    : " + errorThrown.message); // 例外情報
+}
+
+//checkboxのvalueを取得
+function getCheckBoxValues(checkboxes) {
+    let values = [];
+
+    for (let i = 0; i < checkboxes.length; i++) {
+        if (checkboxes[i].checked) {
+            values.push(checkboxes[i].value);
+        }
+    }
+
+    return values;
 }
