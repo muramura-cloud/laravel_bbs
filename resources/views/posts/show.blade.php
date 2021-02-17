@@ -22,7 +22,7 @@ $params['from'] = $from;
             </div>
             <div class="p-2 col-6">
                 <a href="{{Storage::disk('s3')->url($post->img)}}"><img src="{{Storage::disk('s3')->url($post->img)}}"
-                        class="img-fluid"></a>
+                        class="img-fluid w-75"></a>
             </div>
         </div>
         @else
@@ -32,13 +32,13 @@ $params['from'] = $from;
         @endif
 
         <div class="mb-5">
-            @include('components.like',['post' => $post, 'user' => $user, 'like' => $like])
+            @include('components.like',['post' => $post, 'user' => request()->user, 'like' => request()->like])
         </div>
 
         <div class="mb-4 text-left">
             <a class="btn btn-outline-dark" href="{{ route('report_create',$params) }}">報告</a>
             @auth
-            @if ($post->user_id === $user->id)
+            @if ($post->user_id === request()->user->id)
             <a class="btn btn-primary" href="{{ route('posts.edit', $params) }}">編集</a>
             <form style="display: inline-block;" method="POST"
                 action="{{ route('posts.destroy', ['post' => $post->id]) }}">
@@ -94,8 +94,7 @@ $params['from'] = $from;
                     <a name="comment_report_btn" class="btn btn-outline-dark p-1"
                         href="{{ route('report_create',$params) }}" value="{{$comment->id}}"><small>報告</small></a>
                     @auth
-                    @if ($comment->user_id === $user->id)
-                    {{-- もうちょっとここら辺スッキリさせたいな。 --}}
+                    @if ($comment->user_id === request()->user->id)
                     <a class="btn btn-primary p-1"
                         href="{{ route('comments.edit', ['comment' => $comment->id,'page'=>$page,'keyword'=>$keyword,'category'=>$category ,'do_name_search'=>$do_name_search,'from'=>$from]) }}">
                         <small>編集</small></a>

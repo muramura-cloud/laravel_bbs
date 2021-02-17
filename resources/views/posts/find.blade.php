@@ -37,7 +37,7 @@ parse_str($url['query'], $params);
                 </div>
                 <div class="card-footer d-flex justify-content-between">
                     @include('components.post_footer',['post' => $post])
-                    @include('components.like',['post' => $post, 'user' => $user, 'like' => $like])
+                    @include('components.like',['post' => $post, 'user' => request()->user, 'like' => request()->like])
                 </div>
             </div>
             @empty
@@ -55,8 +55,8 @@ parse_str($url['query'], $params);
         </div>
         <div class="col-md-3">
             <br><br><br>
-            @include('components.ranking',['posts'=>$ranking_loved_posts])
-            @include('components.categories',['categories' => $categories])
+            @include('components.ranking',['posts'=>request()->ranking_loved_posts])
+            @include('components.categories',['categories' => request()->categories])
         </div>
     </div>
 </div>

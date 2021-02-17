@@ -37,6 +37,11 @@ class Post extends Model
         return $this->belongsTo('App\Models\User');
     }
 
+    public function getPosts()
+    {
+        return $this::with(['comments'])->withCount('likes')->orderBy('created_at', 'desc')->paginate(10);
+    }
+
     public function getPostsByKeyword($keyword, $page = null)
     {
         $posts = $this::with(['comments'])->withCount('likes')

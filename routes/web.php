@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::group(['middleware' => 'checkAuth'], function () {
+Route::group(['middleware' => ['checkAuth', 'setupSidebar']], function () {
 
     // トップページ
     Route::get('/', 'App\Http\Controllers\PostsController@index')->name('top');

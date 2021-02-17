@@ -10,7 +10,7 @@
             </div>
 
             @foreach ($posts as $post)
-            @include('components.post',['post' => $post, 'user' => $user, 'like' => $like, 'page' =>
+            @include('components.post',['post' => $post, 'user' => request()->user, 'like' => request()->like, 'page' =>
             $posts->currentPage()])
             @endforeach
 
@@ -20,8 +20,8 @@
         </div>
         <div class="col-md-3">
             <br><br><br>
-            @include('components.ranking',['posts' => $ranking_loved_posts])
-            @include('components.categories',['categories' => $categories])
+            @include('components.ranking',['posts' => request()->ranking_loved_posts])
+            @include('components.categories',['categories' => request()->categories])
         </div>
     </div>
 </div>

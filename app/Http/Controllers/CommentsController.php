@@ -54,7 +54,6 @@ class CommentsController extends Controller
         $params = [
             'comment' => $comment,
             'post' => $comment->getPost(),
-            'user' => $request->user,
             'page' => $request->page,
             'keyword' => $request->keyword,
             'category' => $request->category,

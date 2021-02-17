@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Like;
-use App\Models\Category;
 use App\Models\Read;
 use App\Http\Requests\PostRequest;
 use App\Helpers\Helper;
@@ -17,35 +16,23 @@ use Illuminate\Support\Facades\Auth;
 class PostsController extends Controller
 {
     // トップページを表示
-    public function index(Request $request)
+    public function index()
     {
-        $params = [
-            'posts' => Post::with(['comments'])->withCount('likes')->orderBy('created_at', 'desc')->paginate(10),
-            'user' => $request->user,
-            'like' => new Like,
-            'ranking_loved_posts' => Post::withCount('likes')->orderBy('likes_count', 'desc')->take(5)->get(),
-            'categories' => Category::all(),
-        ];
+        $post = new Post;
 
-        return view('posts.index', $params);
+        return view('posts.index', ['posts' => $post->getPosts()]);
     }
 
     // アプリ説明ページを表示
-    public function introduce(Request $request)
+    public function introduce()
     {
-        $params = [
-            'user' => $request->user,
-            'ranking_loved_posts' => Post::withCount('likes')->orderBy('likes_count', 'desc')->take(5)->get(),
-            'categories' => Category::all(),
-        ];
-
-        return view('posts.introduce', $params);
+        return view('posts.introduce');
     }
 
     // 投稿の新規作成ページを表示
     public function create(Request $request)
     {
-        return view('posts.create', ['user' => $request->user, 'page' => $request->page]);
+        return view('posts.create', ['page' => $request->page]);
     }
 
     // 投稿保存
@@ -83,11 +70,9 @@ class PostsController extends Controller
         $params = [
             'post' => Post::withCount('likes')->findOrFail($post_id),
             'page' => $request->page,
-            'user' => $request->user,
             'keyword' => $request->keyword,
             'category' => $request->category,
             'do_name_search' => $request->do_name_search,
-            'like' => new Like,
             'from' => $request->from
         ];
 
@@ -98,7 +83,6 @@ class PostsController extends Controller
     public function edit($post_id, Request $request)
     {
         $params = [
-            'user' => $request->user,
             'post' => Post::findOrFail($post_id),
             'page' => $request->page,
             'keyword' => $request->keyword,
@@ -137,7 +121,7 @@ class PostsController extends Controller
 
         $post->fill($params)->save();
 
-        // ページ遷移ようのパラメーター
+        // ページ遷移のパラメーター
         $params = [
             'post' => $post,
             'page' => $request->page,
@@ -217,14 +201,10 @@ class PostsController extends Controller
 
         $params = [
             'posts' => $posts,
-            'ranking_loved_posts' => Post::withCount('likes')->orderBy('likes_count', 'desc')->take(5)->get(),
-            'user' => $request->user,
             'page' => (int) $request->page,
             'keyword' => $keyword,
             'category' => $request['category'],
             'do_name_search' => $request->do_name_search,
-            'like' => new Like,
-            'categories' => Category::all(),
         ];
 
         return view('posts.find', $params);

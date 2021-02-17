@@ -44,18 +44,7 @@
 
                     <label for="category" class="mr-2 text-white"><strong>カテゴリー</strong></label>
                     <select class="form-control mr-2" id="category" name="category">
-                        <option value="{{null}}">指定なし</option>
-                        <option>マクロ経済学</option>
-                        <option>ミクロ経済学</option>
-                        <option>社会経済学</option>
-                        <option>統計学</option>
-                        <option>経済数学</option>
-                        <option>経営学</option>
-                        <option>会計学</option>
-                        <option>経済史</option>
-                        <option>簿記</option>
-                        <option>金融</option>
-                        <option>その他</option>
+                        @include('components.categories_selectbox',['categories'=>request()->categories])
                     </select>
                     <div class="custom-control custom-checkbox text-light mr-2">
                         <input type="checkbox" name="search_name" value="1" class="custom-control-input"
@@ -69,7 +58,7 @@
                 </form>
                 <div>
                     @auth
-                    <span class="navbar-text mr-1">{{$user->name}}</span>
+                    <span class="navbar-text mr-1">{{request()->user->name}}</span>
                     <a href="/logout">
                         <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">ログアウト</button>
                     </a>

@@ -43,22 +43,9 @@ $params['from']=$from;
 
                 <div class="form-group">
                     <label for="edit_category"><strong>カテゴリー</strong>(任意)</label><br>
-                    {{-- これネームルーティングのカテゴリー項目とかぶっている --}}
                     <select class="form-control" id="edit_category" name="edit_category"
                         data-category="{{$post->category}}">
-                        <option value="{{null}}">指定なし</option>
-                        <option value="マクロ経済学">マクロ経済学</option>
-                        <option value="ミクロ経済学">ミクロ経済学</option>
-                        <option value="社会経済学">社会経済学</option>
-                        <option value="統計学">統計学</option>
-                        <option value="経済数学">経済数学</option>
-                        <option value="経営学">経営学</option>
-                        <option value="会計学">会計学</option>
-                        <option value="経済史">経済史</option>
-                        <option value="経済史">経済史</option>
-                        <option value="簿記">簿記</option>
-                        <option value="金融">金融</option>
-                        <option value="その他">その他</option>
+                        @include('components.categories_selectbox',['categories'=>request()->categories])
                     </select>
                 </div>
 

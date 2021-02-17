@@ -18,9 +18,7 @@ class AdminController extends Controller
     // トップページ(投稿一覧ページを表示)
     public function index()
     {
-        $posts = Post::with(['comments'])->orderBy('created_at', 'desc')->paginate(10);
-
-        return view('admin.index', ['posts' => $posts]);
+        return view('admin.index', ['posts' => Post::with(['comments'])->orderBy('created_at', 'desc')->paginate(10)]);
     }
 
     // コメント一覧ページを表示
